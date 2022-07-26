@@ -1,0 +1,102 @@
+! Scheme color: Sainnhe
+! Author: Ebriopes
+! Everforest
+! special
+*.foreground:   #d3c6aa
+*.background:   #2b3339
+*.cursorColor:  #d3c6aa
+
+! black
+*.color0:       #313c41
+*.color8:       #9da9a0
+
+! red
+*.color1:       #4e3e43
+*.color9:       #e67e80
+
+! green
+*.color2:       #404d44
+*.color10:      #a7c080
+
+! yellow
+*.color3:       #4a4940
+*.color11:      #dbbc7f
+
+! blue
+*.color4:       #394f5a
+*.color12:      #7fbbb3
+
+! magenta
+*.color5:       #504855
+*.color13:      #d699b6
+
+! cyan
+*.color6:       #385053
+*.color14:      #83c092
+
+! white
+*.color7:       #4e4a40
+*.color15:      #fefbf4
+
+! Rofi
+rofi.font: monospace 12
+rofi.padding: 20
+rofi.line-padding: 2
+rofi.color-enabled: true
+rofi.hide-scrollbar: true
+rofi.separator-style: solid
+rofi.color-window: #1c2023, #919ba0, #1c2023
+rofi.color-normal: #1c2023, #919ba0, #1c2023, #a4a4a4, #1c2023
+rofi.color-urgent: argb:00000000, #f43753, argb:00000000, argb:00000000, #e29a49
+rofi.color-active: argb:00000000, #49bbfb, argb:00000000, argb:00000000, #e29a49
+rofi.kb-cancel: Escape,Alt+F1
+
+! xterm
+xterm*termName: xterm-256color
+xterm*font: monospace
+xterm*faceName: monospace:size=11
+xterm*loginShell: true
+xterm*vt100*geometry: 90x34
+xterm*saveLines: 2000
+xterm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+xterm*eightBitInput: false
+xterm*allowBoldFonts: false
+
+! URxvt
+URxvt*saveline: 15000
+URxvt*termName: rxvt-256color
+URxvt*iso14755: false
+URxvt*depth: 32
+URxvt*background: [95]#1C2023
+URxvt*scrollBar: false
+URxvt*scrollBar_right: false
+URxvt*internalBorder: 0
+URxvt*externalBorder: 0
+URxvt*letterSpace: -1
+
+!URxvt.font: xft:ProFont for Powerline:style=regular:size=13
+!URxvt.font: xft:Meslo LG S for Powerline:style=regular:size=11
+!URxvt.font: xft:FiraCode:size=12
+!URxvt.font: xft:RobotoMono Nerd Font Mono:style=bold :size=11
+!URxvt.font: xft:Source Code Pro for Powerline:style=regular:size=11
+!URxvt.font: xft:monospace:size=9
+!URxvt.font: xft:Hack:style=Regular:size=12
+!URxvt.font: xft:DIN Round Pro:style=Light:size=11
+URxvt.font: xft:MesloLGM Nerd Font Mono:style=regular:size=12
+URxvt.copyCommand: xclip -i -selection clipboard
+URxvt.pasteCommand: xclip -o -selection clipboard
+URxvt.urlLauncher: exo-open
+URxvt.cursorBlink: true
+URxvt.cursorUnderline: true
+URxvt.underlineURLs: true
+URxvt.urlButton: 1
+URxvt.geometry: 110x20
+URxvt.tabbed.tabbar-fg: 4
+URxvt.tabbed.tabbar-bg: 16
+URxvt.tabbed.tab-fg: 15
+URxvt.tabbed.tab-bg: 4
+URxvt*buffered: false
+
+URxvt.perl-ext-common: default,matcher,font-size
+URxvt.url-launcher: /usr/bin/qutebrowser
+URxvt.matcher.button: 1
