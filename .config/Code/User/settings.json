@@ -1,0 +1,11 @@
+{
+  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.colorTheme": "Cobalt2",
+  "editor.fontFamily": "'Fira Code', 'MesloLGM Nerd Font Mono', monospace",
+  "editor.minimap.enabled": false,
+  "workbench.iconTheme": "material-icon-theme",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "tabnine.experimentalAutoImports": true,
+  "terminal.integrated.enablePersistentSessions": false
+}

@@ -73,6 +73,7 @@ URxvt*scrollBar_right: false
 URxvt*internalBorder: 0
 URxvt*externalBorder: 0
 URxvt*letterSpace: -1
+URxvt*intensityStyles: true
 
 !URxvt.font: xft:ProFont for Powerline:style=regular:size=13
 !URxvt.font: xft:Meslo LG S for Powerline:style=regular:size=11
