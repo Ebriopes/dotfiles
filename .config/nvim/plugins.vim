@@ -12,6 +12,9 @@ Plug 'preservim/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 
+" Tags
+Plug 'ludovicchabant/vim-gutentags'
+
 call plug#end()
 
 let g:plug_window = 'botright new'
