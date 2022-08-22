@@ -1,11 +1,13 @@
 {
   "security.workspace.trust.untrustedFiles": "open",
-  "workbench.colorTheme": "Cobalt2",
+  "workbench.colorTheme": "Everforest Dark",
   "editor.fontFamily": "'Fira Code', 'MesloLGM Nerd Font Mono', monospace",
   "editor.minimap.enabled": false,
   "workbench.iconTheme": "material-icon-theme",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
   "tabnine.experimentalAutoImports": true,
-  "terminal.integrated.enablePersistentSessions": false
+  "terminal.integrated.enablePersistentSessions": false,
+  "editor.experimental.stickyScroll.enabled": true,
+  "rapidapi.terminalLink.enabled": false
 }
