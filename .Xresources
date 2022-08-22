@@ -1,42 +1,50 @@
-! Scheme color: Sainnhe
-! Author: Ebriopes
-! Everforest
-! special
-*.foreground:   #d3c6aa
-*.background:   #2b3339
-*.cursorColor:  #d3c6aa
+! Copyright (c) 2016-present Arctic Ice Studio <development@arcticicestudio.com>
+! Copyright (c) 2016-present Sven Greb <code@svengreb.de>
 
-! black
-*.color0:       #313c41
-*.color8:       #9da9a0
+! Project:    Nord XResources
+! Version:    0.1.0
+! Repository: https://github.com/arcticicestudio/nord-xresources
+! License:    MIT
 
-! red
-*.color1:       #4e3e43
-*.color9:       #e67e80
+#define nord0 #2E3440
+#define nord1 #3B4252
+#define nord2 #434C5E
+#define nord3 #4C566A
+#define nord4 #D8DEE9
+#define nord5 #E5E9F0
+#define nord6 #ECEFF4
+#define nord7 #8FBCBB
+#define nord8 #88C0D0
+#define nord9 #81A1C1
+#define nord10 #5E81AC
+#define nord11 #BF616A
+#define nord12 #D08770
+#define nord13 #EBCB8B
+#define nord14 #A3BE8C
+#define nord15 #B48EAD
 
-! green
-*.color2:       #404d44
-*.color10:      #a7c080
+*.foreground:   nord4
+*.background:   nord0
+*.cursorColor:  nord4
+*fading: 35
+*fadeColor: nord3
 
-! yellow
-*.color3:       #4a4940
-*.color11:      #dbbc7f
-
-! blue
-*.color4:       #394f5a
-*.color12:      #7fbbb3
-
-! magenta
-*.color5:       #504855
-*.color13:      #d699b6
-
-! cyan
-*.color6:       #385053
-*.color14:      #83c092
-
-! white
-*.color7:       #4e4a40
-*.color15:      #fefbf4
+*.color0: nord1
+*.color1: nord11
+*.color2: nord14
+*.color3: nord13
+*.color4: nord9
+*.color5: nord15
+*.color6: nord8
+*.color7: nord5
+*.color8: nord3
+*.color9: nord11
+*.color10: nord14
+*.color11: nord13
+*.color12: nord9
+*.color13: nord15
+*.color14: nord7
+*.color15: nord6
 
 ! Rofi
 rofi.font: monospace 12
@@ -98,6 +106,6 @@ URxvt.tabbed.tab-fg: 15
 URxvt.tabbed.tab-bg: 4
 URxvt*buffered: false
 
-URxvt.perl-ext-common: default,matcher,font-size
+URxvt.perl-ext-common: default,unichr,matcher,font-size
 URxvt.url-launcher: /usr/bin/qutebrowser
 URxvt.matcher.button: 1
