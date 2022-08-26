@@ -1,5 +1,8 @@
 "let g:mapleader = ' ' " Space key like leader
 
+" Add a second leader key, that can be useful to latam layout
+nmap , <leader>
+
 nnoremap <leader>q :q<CR> " Quit current window
 nnoremap <leader>w :w<CR> " Save current file
 nnoremap <leader>e :e $MYVIMRC<CR> " Open init vim file
