@@ -1,0 +1,4 @@
+#!/bin/sh
+feh --no-fehbg --bg-fill --randomize ~/Imágenes/wallpapers/*
+
+notify-send -i preferences-desktop-display-symbolic -a autorandr "Display profile" "$AUTORANDR_CURRENT_PROFILE"
