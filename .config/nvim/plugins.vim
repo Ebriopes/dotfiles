@@ -1,4 +1,6 @@
 call plug#begin()
+" Themes
+Plug 'sainnhe/everforest'
 
 " Tree
 "Plug 'nvim-neo-tree/neo-tree.nvim'
