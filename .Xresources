@@ -84,13 +84,12 @@ URxvt*externalBorder: 0
 URxvt*intensityStyles: true
 
 !URxvt.font: xft:ProFont for Powerline:style=regular:size=13
-!URxvt.font: xft:Meslo LG S for Powerline:style=regular:size=11
+URxvt.font: xft:MesloLGS NF:style=regular:size=11
 !URxvt.font: xft:FiraCode:size=12
 !URxvt.font: xft:RobotoMono Nerd Font Mono:style=bold :size=11
 !URxvt.font: xft:Source Code Pro for Powerline:style=regular:size=11
 !URxvt.font: xft:monospace:size=9
 !URxvt.font: xft:DIN Round Pro:style=Light:size=11
-URxvt.font: xft:MesloLGM Nerd Font Mono:style=regular:size=12
 URxvt.copyCommand: xclip -i -selection clipboard
 URxvt.pasteCommand: xclip -o -selection clipboard
 URxvt.urlLauncher: exo-open

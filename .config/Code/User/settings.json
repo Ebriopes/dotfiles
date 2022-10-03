@@ -1,13 +1,146 @@
 {
-  "security.workspace.trust.untrustedFiles": "open",
-  "workbench.colorTheme": "Everforest Dark",
-  "editor.fontFamily": "'Fira Code', 'MesloLGM Nerd Font Mono', monospace",
+  "cSpell.enabled": false,
+  "cSpell.language": ",es",
+  "editor.cursorStyle": "block",
+  "editor.fontFamily": "'Fira Code', 'MesloLGS NF', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontWeight": "400",
+  "editor.formatOnSave": true,
+  "editor.guides.bracketPairs": "active",
   "editor.minimap.enabled": false,
-  "workbench.iconTheme": "material-icon-theme",
-  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.renderWhitespace": "all",
+  "editor.suggest.showStatusBar": true,
+  "editor.suggestSelection": "first",
+  "editor.tabSize": 2,
+  "explorer.confirmDragAndDrop": false,
+  "git.autofetch": true,
+  "javascript.format.insertSpaceAfterConstructor": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "javascript.format.semicolons": "insert",
   "javascript.updateImportsOnFileMove.enabled": "always",
+  "liveshare.presence": true,
+  "quokka.automaticRestart": true,
+  "rapidapi.terminalLink.enabled": false,
+  "security.workspace.trust.untrustedFiles": "open",
   "tabnine.experimentalAutoImports": true,
+  "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.enablePersistentSessions": false,
-  "editor.experimental.stickyScroll.enabled": true,
-  "rapidapi.terminalLink.enabled": false
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.tree.renderIndentGuides": "always",
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "aeschli.vscode-css-formatter"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "highlight-matching-tag.styles": {
+    "opening": {
+      "left": {
+        "custom": {
+          "borderWidth": "0 0 0 1px",
+          "borderStyle": "dotted",
+          "borderColor": "white",
+          "borderRadius": "5px",
+          "overviewRulerColor": "white"
+        }
+      },
+      "right": {
+        "custom": {
+          "borderWidth": "0 1px 0 0",
+          "borderStyle": "dotted",
+          "borderColor": "white",
+          "borderRadius": "5px",
+          "overviewRulerColor": "white"
+        }
+      }
+    }
+  },
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": [
+          "keyword.operator.new.ts",
+          "entity.name.type.ts",
+          "comment.line.double-slash.ts",
+          "keyword.control.import.ts",
+          "keyword.control.from.ts",
+          "constant.language.json.comments"
+        ],
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.accessor.optional.ts",
+          "punctuation.definition.block.ts",
+          "constant.numeric.decimal.ts",
+          "punctuation.accessor.optional.js"
+        ],
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": [
+          "variable.other.readwrite.alias.ts",
+          "variable.other.readwrite.ts"
+        ],
+        "settings": {
+          "fontStyle": ""
+        }
+      },
+      {
+        "scope": ["string.quoted.single.ts", "string.template.ts"],
+        "settings": {
+          "fontStyle": "underline"
+        }
+      },
+      {
+        "scope": ["constant.language.null.ts"],
+        "settings": {
+          "fontStyle": "strikethrough"
+        }
+      }
+    ]
+  },
+  "colorize.languages": ["json"],
+  "colorize.hide_current_line_decorations": false,
+  // "indentRainbow.colors": [
+  //   "rgba(255, 244, 223,0.25)",
+  //   "rgba(231, 219, 255,0.25)",
+  //   "rgba(242, 128, 159, 0.25)",
+  //   "rgba(112, 234, 199,0.25)",
+  //   "rgba(98, 168, 237,0.25)"
+  // ],
+  "json.schemas": [],
+  "vscode_custom_css.imports": ["file:///home/danvar/.vscode/custom/fonts.css"],
+  "editor.fontSize": 16,
+  "editor.stickyScroll.enabled": true,
+  "workbench.colorTheme": "Forest Focus"
 }

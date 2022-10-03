@@ -11,7 +11,7 @@ module.exports = {
     fontSize: 12,
     // font family with optional fallbacks
     fontFamily:
-      'Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
+      '"MesloLGS NF", Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
     // default font weight: 'normal' or 'bold'
     fontWeight: "normal",
     // font weight for bold characters: 'normal' or 'bold'
@@ -51,7 +51,7 @@ module.exports = {
     // default: `true` (without backticks and without quotes) on Windows and Linux, ignored on macOS
     showWindowControls: "",
     // custom padding (CSS format, i.e.: `top right bottom left`)
-    padding: "12px 14px",
+    padding: "10px 1px 10px 10px",
     // the full list. if you're going to provide the full color palette,
     // including the 6 x 6 color cubes and the grayscale map, just provide
     // an array here instead of a color map object
@@ -149,7 +149,7 @@ module.exports = {
     "hyper-tab-icons",
     "hyper-hide-title",
     "shades-of-purple-hyper",
-  ], 
+  ],
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
   // to load it and avoid it being `npm install`ed
