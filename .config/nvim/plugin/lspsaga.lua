@@ -2,7 +2,7 @@ local ok, saga = pcall(require, 'lspsaga')
 
 if not ok then
   return
-end 
+end
 
 local keymap = vim.keymap.set
 

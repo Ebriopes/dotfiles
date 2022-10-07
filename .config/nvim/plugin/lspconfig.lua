@@ -31,7 +31,7 @@ end
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   -- Enable completion triggered by <c-x><c-o>
   --vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
@@ -73,6 +73,13 @@ local on_attach = function(_, bufnr)
     keymap(bufnr, 'n', '<space>ca', 'lsp_buf.code_action', bufopts)
     --keymap(bufnr, 'n', 'gr', 'lsp_buf.references', bufopts)
     keymap(bufnr, 'n', '<space>f', 'lsp_buf.formatting', bufopts)
+  end
+
+  if client.resolved_capabilities.document_formatting then
+    vim.api.nvim_command [[autogroup Format]]
+    vim.api.nvim_command [[autocmd! * <buffer>]]
+    vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
+    vim.api.nvim_command [[autogroup END]]
   end
 
   protocol.CompletionItemKind = {
@@ -218,7 +225,18 @@ local lang_settings = {
         markdown = 'prettier',
       }
     }
-  }
+  },
+  --tsserver = {
+    --init_options = {
+      --formatters = {
+        --prettier = {
+          --command = 'prettier',
+          --args = { '--stdin-filepath', '%filename' }
+        --}
+      --},
+      ----formatFiletypes = {}
+    --}
+  --}
 }
 
 --local servers = { 'pyright', 'vimls', 'sumneko_lua', 'tsserver', 'diagnosticls', "angularls", 'bashls', 'cssls', 'eslint',
