@@ -56,7 +56,7 @@ local on_attach = function(client, bufnr)
     keymap('n', '<space>rn', lsp_buf.rename, bufopts)
     keymap('n', '<space>ca', lsp_buf.code_action, bufopts)
     --keymap('n', 'gr', lsp_buf.references, bufopts)
-    keymap('n', '<space>f', lsp_buf.formatting, bufopts)
+    --keymap('n', '<space>f', lsp_buf.formatting, bufopts)
   else
     local keymap = vim.api.nvim_buf_set_keymap
 
@@ -75,12 +75,12 @@ local on_attach = function(client, bufnr)
     keymap(bufnr, 'n', '<space>f', 'lsp_buf.formatting', bufopts)
   end
 
-  if client.resolved_capabilities.document_formatting then
-    vim.api.nvim_command [[autogroup Format]]
-    vim.api.nvim_command [[autocmd! * <buffer>]]
-    vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
-    vim.api.nvim_command [[autogroup END]]
-  end
+  --if client.resolved_capabilities.document_formatting then
+    --vim.api.nvim_command [[autogroup Format]]
+    --vim.api.nvim_command [[autocmd! * <buffer>]]
+    --vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
+    --vim.api.nvim_command [[autogroup END]]
+  --end
 
   protocol.CompletionItemKind = {
       '', -- Text
@@ -121,7 +121,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 local ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
 
 if ok then
-  capabilities = cmp_lsp.update_capabilities(capabilities)
+  capabilities = cmp_lsp.default_capabilities(capabilities)
 end
 
 local lang_settings = {
@@ -241,7 +241,7 @@ local lang_settings = {
 
 --local servers = { 'pyright', 'vimls', 'sumneko_lua', 'tsserver', 'diagnosticls', "angularls", 'bashls', 'cssls', 'eslint',
 --'gdscript', 'graphql', 'html', 'jsonls', 'sqlls' }
-local servers = { 'pyright', 'vimls', 'sumneko_lua', 'tsserver', 'angularls', 'bashls', 'cssls', 'jsonls', 'graphql', 'html' }
+local servers = { 'pyright', 'vimls', 'lua_ls', 'tsserver', 'angularls', 'bashls', 'cssls', 'jsonls', 'graphql', 'html' }
 
 for _, lsp in ipairs(servers) do
   local config = {
