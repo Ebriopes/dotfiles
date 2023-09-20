@@ -1,84 +1,31 @@
 {
-  "cSpell.enabled": false,
-  "cSpell.language": ",es",
+  // Global configuration
+  "workbench.tree.renderIndentGuides": "always",
+
+  "editor.cursorSmoothCaretAnimation": "on",
   "editor.cursorStyle": "block",
-  "editor.fontFamily": "'Fira Code', 'MesloLGS NF', monospace",
+  "editor.find.addExtraSpaceOnTop": false,
+  "editor.fontFamily": "'Fira Code', 'MesloLGS NF', 'NotoSansMono Nerd Font', monospace",
   "editor.fontLigatures": true,
   "editor.fontWeight": "400",
   "editor.formatOnSave": true,
+  "editor.glyphMargin": false,
   "editor.guides.bracketPairs": "active",
+  "editor.inlineSuggest.showToolbar": "always",
+  "editor.lineNumbers": "relative",
+  "editor.linkedEditing": true,
   "editor.minimap.enabled": false,
   "editor.renderWhitespace": "all",
+  "editor.scrollBeyondLastLine": false,
+  "editor.smoothScrolling": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.suggest.shareSuggestSelections": true,
+  "editor.suggest.showDeprecated": false,
   "editor.suggest.showStatusBar": true,
-  "editor.suggestSelection": "first",
   "editor.tabSize": 2,
-  "explorer.confirmDragAndDrop": false,
-  "git.autofetch": true,
-  "javascript.format.insertSpaceAfterConstructor": true,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
-  "javascript.format.semicolons": "insert",
-  "javascript.updateImportsOnFileMove.enabled": "always",
-  "liveshare.presence": true,
-  "quokka.automaticRestart": true,
-  "rapidapi.terminalLink.enabled": false,
-  "security.workspace.trust.untrustedFiles": "open",
-  "tabnine.experimentalAutoImports": true,
-  "terminal.integrated.cursorBlinking": true,
-  "terminal.integrated.enablePersistentSessions": false,
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-  "workbench.iconTheme": "material-icon-theme",
-  "workbench.tree.renderIndentGuides": "always",
-  "files.exclude": {
-    "**/.classpath": true,
-    "**/.project": true,
-    "**/.settings": true,
-    "**/.factorypath": true
-  },
-  "files.watcherExclude": {
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "**/node_modules/*/**": true
-  },
-  "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "aeschli.vscode-css-formatter"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "highlight-matching-tag.styles": {
-    "opening": {
-      "left": {
-        "custom": {
-          "borderWidth": "0 0 0 1px",
-          "borderStyle": "dotted",
-          "borderColor": "white",
-          "borderRadius": "5px",
-          "overviewRulerColor": "white"
-        }
-      },
-      "right": {
-        "custom": {
-          "borderWidth": "0 1px 0 0",
-          "borderStyle": "dotted",
-          "borderColor": "white",
-          "borderRadius": "5px",
-          "overviewRulerColor": "white"
-        }
-      }
-    }
+  "editor.quickSuggestions": {
+    "comments": "on",
+    "strings": "on"
   },
   "editor.tokenColorCustomizations": {
     "textMateRules": [
@@ -129,8 +76,65 @@
       }
     ]
   },
-  "colorize.languages": ["json"],
+
+  "explorer.confirmDragAndDrop": false,
+  "explorer.fileNesting.enabled": true,
+
+  "security.workspace.trust.untrustedFiles": "open",
+
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.enablePersistentSessions": false,
+  "terminal.integrated.gpuAcceleration": "on",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.explorerKind": "external",
+  "terminal.external.linuxExec": "urxvt",
+  "terminal.integrated.persistentSessionReviveProcess": "never",
+
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true
+  },
+
+  // Languages configurations
+  "css.completion.triggerPropertyValueCompletion": true,
+  "css.styleSheets": [
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  ],
+  // "css.enabledLanguages": ["html"]
+  "javascript.format.insertSpaceAfterConstructor": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "javascript.format.semicolons": "insert",
+  "javascript.suggest.paths": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "json.schemas": [],
+  "typescript.suggest.paths": false,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "workbench.list.smoothScrolling": true,
+  "workbench.colorTheme": "Everforest Dark",
+
+  // Extensions
+  "cSpell.userWords": ["daniel", "ebriopes", "mariadb", "nvidia"],
+  "cSpell.customDictionaries": {},
+  "cSpell.language": "en,es",
   "colorize.hide_current_line_decorations": false,
+  "colorize.languages": ["json"],
+  "git.autofetch": true,
+  "liveshare.presence": true,
+  "quokka.automaticRestart": true,
+  "rapidapi.terminalLink.enabled": false,
+  "tabnine.experimentalAutoImports": true,
+  "vscode_custom_css.imports": ["file:///home/danvar/.vscode/custom/fonts.css"],
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
   // "indentRainbow.colors": [
   //   "rgba(255, 244, 223,0.25)",
   //   "rgba(231, 219, 255,0.25)",
@@ -138,9 +142,55 @@
   //   "rgba(112, 234, 199,0.25)",
   //   "rgba(98, 168, 237,0.25)"
   // ],
-  "json.schemas": [],
-  "vscode_custom_css.imports": ["file:///home/danvar/.vscode/custom/fonts.css"],
-  "editor.fontSize": 16,
-  "editor.stickyScroll.enabled": true,
-  "workbench.colorTheme": "Forest Focus"
+  "highlight-matching-tag.styles": {
+    "opening": {
+      "left": {
+        "custom": {
+          "borderWidth": "0 0 0 1px",
+          "borderStyle": "dotted",
+          "borderColor": "white",
+          "borderRadius": "5px",
+          "overviewRulerColor": "white"
+        }
+      },
+      "right": {
+        "custom": {
+          "borderWidth": "0 1px 0 0",
+          "borderStyle": "dotted",
+          "borderColor": "white",
+          "borderRadius": "5px",
+          "overviewRulerColor": "white"
+        }
+      }
+    }
+  },
+
+  // specific language configuration
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml,LICENSE,.gitignore, tsconfig*"
+  }
 }
