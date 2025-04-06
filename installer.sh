@@ -48,8 +48,8 @@ install_packages() {
 }
 
 case "$distro" in
-    Ubuntu|Debian) install_packages "apt-get" "git curl gcc g++ clang make rofi urxvt" ;;
-    Manjaro|Arch) install_packages "pacman" "git curl gcc g++ clang make rofi urxvt" ;;
+    ubuntu|debian) install_packages "apt-get" "git curl gcc g++ clang make rofi urxvt" ;;
+    manjaro|arch) install_packages "pacman" "git curl gcc g++ clang make rofi urxvt" ;;
     alpine) install_packages "apk" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
 esac
 
@@ -72,7 +72,7 @@ install_nvm
 
 printf "[1;34mDownloading original installer script...\n[0m"
 # temp_dir=$(mktemp -d) || { printf "[1;31mError: Failed to create temporary directory.\n[0m"; exit 1; }
-printf "[1;34mDownloading to %s...\n[0m" "$temp_dir"
+printf "[1;34mDownloading to %s...\n[0m" "${PWD}"
 
 (
     # cd "$temp_dir" || { printf "[1;31mError: Failed to change to temporary directory.\n[0m"; exit 1; }
