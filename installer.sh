@@ -48,8 +48,8 @@ install_packages() {
 }
 
 case "$distro" in
-    ubuntu|debian) install_packages "apt-get" "git curl gcc g++ clang make rofi urxvt" ;;
-    manjaro|arch) install_packages "pacman" "git curl gcc g++ clang make rofi urxvt" ;;
+    ubuntu|debian) install_packages "apt-get" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
+    manjaro|arch) install_packages "pacman" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
     alpine) install_packages "apk" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
 esac
 
