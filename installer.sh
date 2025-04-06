@@ -83,6 +83,28 @@ if [ "$distro" = "Ubuntu" ] || [ "$distro" = "Debian" ]; then
     install_packages "apk" "git curl gcc g++ clang make rofi rxvt-unicode"
 fi
 
+# Function to install NVM
+install_nvm() {
+    printf "[1;33mInstalling NVM...\n[0m"
+    
+    if command -v curl &> /dev/null; then
+        printf "[1;34mUsing curl to install NVM...\n[0m"
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+        elif command -v wget &> /dev/null; then
+        printf "[1;34mUsing wget to install NVM...\n[0m"
+        wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+    else
+        printf "[1;31mError: Neither curl nor wget are available. Please install one of them to proceed with NVM installation.\n[0m"
+        return 1
+    fi
+    
+    printf "[1;32mNVM installed successfully!\n[0m"
+}
+
+install_nvm
+
+
 printf "[1;34mRunning original installer script...\n[0m"
 
-bash ${PWD}/dotfiles/original-installer.sh # Ejecuta el script original
+wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/original-installer.sh | bash
+# bash ${PWD}/dotfiles/original-installer.sh # Ejecuta el script original
