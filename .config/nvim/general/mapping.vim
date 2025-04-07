@@ -5,7 +5,7 @@ nmap , <leader>
 
 nnoremap <leader>q :q<CR>" Quit current window
 nnoremap <leader>w :w<CR>" Save current file
-nnoremap <leader>R :so $MYVIMRC<CR>" Save current file
+nnoremap <leader>R :so $MYVIMRC<CR>" Refresh the Neovim source
 nnoremap <leader>e :e $MYVIMRC<CR>" Open init vim file
 
 " Copy selection to system clipboard
@@ -26,9 +26,9 @@ vnoremap <leader>d "+d
 nnoremap <leader>d "+d
 
 " Buffers
-nnoremap <leader>l :bnext<CR>
-nnoremap <leader>j :bprevious<CR>
-nnoremap <leader><Tab> :buffer<Space><Tab>
+nnoremap <leader>bl :bnext<CR>
+nnoremap <leader>bh :bprevious<CR>
+nnoremap <leader><Tab> :buffers<CR>:buffer<Space>
 
 " Buffers
 nnoremap <leader>bq :bd<CR>

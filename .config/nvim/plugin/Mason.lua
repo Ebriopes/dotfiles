@@ -78,7 +78,7 @@ mason.setup(DEFAULT_SETTINGS)
 require("mason-lspconfig").setup({
   -- A list of servers to automatically install if they're not already installed. Example: { "rust_analyzer@nightly", "sumneko_lua" }
   -- This setting has no relation with the `automatic_installation` setting.
-  ensure_installed = { "angularls", "bashls", "cssls", "eslint", "graphql", "html", "jsonls", "tsserver", "lua_ls",
+  ensure_installed = { "angularls", "bashls", "cssls", "eslint", "graphql", "html", "jsonls", "ts_ls", "lua_ls",
     "pylsp", "sqlls", "vimls" },
 
   -- Whether servers that are set up (via lspconfig) should be automatically installed if they're not already installed.
