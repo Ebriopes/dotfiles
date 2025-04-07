@@ -24,7 +24,7 @@ call plug#begin()
   Plug 'tpope/vim-surround'
 
   " Tags
-  Plug 'ludovicchabant/vim-gutentags'
+  Plug 'ludovicchabant/vim-gutentags', { 'on': [] }
 
   " Linter
   "Plug 'dense-analysis/ale'
@@ -37,20 +37,26 @@ call plug#begin()
   Plug 'chrisbra/NrrwRgn'
 
   " Float terminal
-  Plug 'voldikss/vim-floaterm'
+  Plug 'voldikss/vim-floaterm', { 'on': [] }
 
   if has('nvim')
     " Tree
     Plug 'kevinhwang91/rnvimr'
     
     " Notifications
-    Plug 'rcarriga/nvim-notify'
+    Plug 'rcarriga/nvim-notify', { 'on': [] }
 
     " Icons
     Plug 'kyazdani42/nvim-web-devicons'
 
+    " RipGrep
+    Plug 'duane9/nvim-rg'
+
     " Language Server Protocols
-    Plug 'neovim/nvim-lspconfig', {'tag': 'v0.1.3'}
+    Plug 'neovim/nvim-lspconfig', { 'tag': 'v0.1.3'}
+
+    if has('nvim-0.3.1')
+      Plug 'dstein64/vim-startuptime'
 
     if has('nvim-0.5')
       Plug 'L3MON4D3/LuaSnip'
@@ -58,6 +64,7 @@ call plug#begin()
       if !has('nvim-0.7.0')
         " Manager installer
         Plug 'MordechaiHadad/nvim-lspmanager'
+      endif
       endif
     endif
 
@@ -72,11 +79,11 @@ call plug#begin()
       Plug 'williamboman/mason-lspconfig.nvim'
 
       " Autocompletion
-      Plug 'hrsh7th/nvim-cmp' "Autocompletion plugin
+      Plug 'hrsh7th/nvim-cmp'  "Autocompletion plugin
 
       " Language Server Protocols
       Plug 'hrsh7th/cmp-nvim-lsp' "LSP source for nvim-cmp
-      Plug 'neovim/nvim-lspconfig', {'branch': 'master'}
+      Plug 'neovim/nvim-lspconfig', { 'branch': 'master'}
       Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
 
       " For luasnip users.
@@ -85,10 +92,14 @@ call plug#begin()
       " Highlighting support
       Plug 'nvim-treesitter/nvim-treesitter' ", {'do': ':TSUpdate'}
 
+    endif
+
+    if has('nvim-0.9.0')
       " Search engine
-      Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
-        Plug 'nvim-lua/plenary.nvim'
-        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+      Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0', 'on': [] }
+      Plug 'nvim-lua/plenary.nvim', { 'on': [] }
+        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make', 'on': [] }
+
     endif
 
   else
@@ -97,7 +108,7 @@ call plug#begin()
 
     " Completion
     " Use release branch (recommend)
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/coc.nvim', { 'branch': 'release'}
   endif
 
 call plug#end()

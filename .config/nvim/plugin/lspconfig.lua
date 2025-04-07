@@ -56,7 +56,7 @@ local on_attach = function(client, bufnr)
     keymap('n', '<space>rn', lsp_buf.rename, bufopts)
     keymap('n', '<space>ca', lsp_buf.code_action, bufopts)
     --keymap('n', 'gr', lsp_buf.references, bufopts)
-    --keymap('n', '<space>f', lsp_buf.formatting, bufopts)
+    keymap('n', '<space>f', lsp_buf.format, bufopts)
   else
     local keymap = vim.api.nvim_buf_set_keymap
 
@@ -72,7 +72,7 @@ local on_attach = function(client, bufnr)
     keymap(bufnr, 'n', '<space>rn', 'lsp_buf.rename', bufopts)
     keymap(bufnr, 'n', '<space>ca', 'lsp_buf.code_action', bufopts)
     --keymap(bufnr, 'n', 'gr', 'lsp_buf.references', bufopts)
-    keymap(bufnr, 'n', '<space>f', 'lsp_buf.formatting', bufopts)
+    --keymap(bufnr, 'n', '<space>f', lsp_buf.formatting, bufopts)
   end
 
   --if client.resolved_capabilities.document_formatting then
@@ -111,7 +111,7 @@ local on_attach = function(client, bufnr)
     }
 end
 
-local lsp_flags = {
+local sp_flags = {
   -- This is the default in Nvim 0.7+
   debounce_text_changes = 150,
 }
@@ -146,7 +146,7 @@ local lang_settings = {
       vimruntime = ""
     }
   },
-  sumneko_lua = {
+  lua_ls = {
     settings = {
       Lua = {
         --[[
@@ -170,78 +170,19 @@ local lang_settings = {
       },
     },
   },
-  diagnosticls = {
-    filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss',
-      'markdown', 'pandoc' },
-    init_options = {
-      linters = {
-        eslint = {
-          command = 'eslint_d',
-          rootPatterns = { '.git' },
-          debounce = 100,
-          args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
-          sourceName = 'eslint_d',
-          parseJson = {
-            errorsRoot = '[0].messages',
-            line = 'line',
-            column = 'column',
-            endLine = 'endLine',
-            endColumn = 'endColumn',
-            message = '[eslint] ${message} [${ruleId}]',
-            security = 'severity'
-          },
-          securities = {
-            [2] = 'error',
-            [1] = 'warning'
-          }
-        },
-      },
-      filetypes = {
-        javascript = 'eslint',
-        javascriptreact = 'eslint',
-        typescript = 'eslint',
-        typescriptreact = 'eslint',
-      },
-      formatters = {
-        eslint_d = {
-          command = 'eslint_d',
-          args = { '--stdin', '--stdin-filename', '%filename', '--fix-to-stdout' },
-          rootPatterns = { '.git' },
-        },
-        prettier = {
-          command = 'prettier',
-          args = { '--stdin-filepath', '%filename' }
-        }
-      },
-      formatFiletypes = {
-        css = 'prettier',
-        javascript = 'eslint_d',
-        javascriptreact = 'eslint_d',
-        json = 'prettier',
-        scss = 'prettier',
-        less = 'prettier',
-        typescript = 'eslint_d',
-        typescriptreact = 'eslint_d',
-        markdown = 'prettier',
-      }
-    }
-  },
-  --tsserver = {
-    --init_options = {
-      --formatters = {
-        --prettier = {
-          --command = 'prettier',
-          --args = { '--stdin-filepath', '%filename' }
-        --}
-      --},
-      ----formatFiletypes = {}
-    --}
-  --}
+  biome = {
+    cmd = { "biome", "lsp-proxy" },
+    filetypes = { "astro", "css", "graphql", "javascript", "javascriptreact", "json", "jsonc", "svelte", "typescript", "typescript.tsx", "typescriptreact", "vue" },
+    root_dir = function(fname)
+      local root_files = { 'biome.json', 'biome.jsonc' }
+      root_files = util.insert_package_json(root_files, 'biome', fname)
+      return vim.fs.dirname(vim.fs.find(root_files, { path = fname, upward = true })[1])
+    end,
+    single_file_support = false,
+  }
 }
 
---local servers = { 'pyright', 'vimls', 'sumneko_lua', 'tsserver', 'diagnosticls', "angularls", 'bashls', 'cssls', 'eslint',
---'gdscript', 'graphql', 'html', 'jsonls', 'sqlls' }
-local servers = { 'pyright', 'vimls', 'lua_ls', 'tsserver', 'angularls', 'bashls', 'cssls', 'jsonls', 'graphql', 'html' }
+local servers = { 'pyright', 'vimls', 'lua_ls', 'ts_ls', 'biome', 'angularls', 'bashls', 'cssls', 'jsonls', 'graphql', 'html', 'lemminx' }
 
 for _, lsp in ipairs(servers) do
   local config = {
@@ -254,15 +195,19 @@ for _, lsp in ipairs(servers) do
   end
 
   if lang_settings[lsp] then
-    if lang_settings[lsp].filetypes then
-      config.filetypes = lang_settings[lsp].filetypes
+    for k,v in pairs(lang_settings[lsp]) do
+      config[k] = v
     end
-    if lang_settings[lsp].settings then
-      config.settings = lang_settings[lsp].settings
-    end
-    if lang_settings[lsp].init_options then
-      config.init_options = lang_settings[lsp].init_options
-    end
+
+    -- if lang_settings[lsp].filetypes then
+    --   config.filetypes = lang_settings[lsp].filetypes
+    -- end
+    -- if lang_settings[lsp].settings then
+    --   config.settings = lang_settings[lsp].settings
+    -- end
+    -- if lang_settings[lsp].init_options then
+    --   config.init_options = lang_settings[lsp].init_options
+    -- end
   end
 
   lspconfig[lsp].setup(config)
@@ -285,8 +230,9 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 }
 )
 
-local notify = require('notify')
+local notify_ok, notify = pcall(require, 'notify')
 
+if notify_ok then
 vim.lsp.handlers['window/showMessage'] = function(_, result, ctx)
   local client = vim.lsp.get_client_by_id(ctx.client_id)
   local lvl = ({ 'ERROR', 'WARN', 'INFO', 'DEBUG' })[result.type]
@@ -299,3 +245,5 @@ vim.lsp.handlers['window/showMessage'] = function(_, result, ctx)
     end
   })
 end
+end
+
