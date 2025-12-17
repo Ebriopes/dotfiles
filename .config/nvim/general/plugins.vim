@@ -44,10 +44,10 @@ call plug#begin()
     Plug 'kevinhwang91/rnvimr'
     
     " Notifications
-    Plug 'rcarriga/nvim-notify', { 'on': [] }
+    Plug 'rcarriga/nvim-notify'
 
     " Icons
-    Plug 'kyazdani42/nvim-web-devicons'
+    "Plug 'kyazdani42/nvim-web-devicons'
 
     " RipGrep
     Plug 'duane9/nvim-rg'
@@ -92,14 +92,22 @@ call plug#begin()
       " Highlighting support
       Plug 'nvim-treesitter/nvim-treesitter' ", {'do': ':TSUpdate'}
 
+      " Icons
+      Plug 'nvim-tree/nvim-web-devicons'
+
     endif
 
     if has('nvim-0.9.0')
       " Search engine
-      Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0', 'on': [] }
-      Plug 'nvim-lua/plenary.nvim', { 'on': [] }
-        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make', 'on': [] }
+      Plug 'nvim-telescope/telescope.nvim', { 'tag': 'v0.1.9' }
+      Plug 'nvim-lua/plenary.nvim'
+        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
+    endif
+
+    if has('nvim-0.10.4')
+      " Search engine
+      Plug 'nvim-telescope/telescope.nvim', { 'tag': 'v0.2.0' }
     endif
 
   else

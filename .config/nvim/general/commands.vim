@@ -20,6 +20,17 @@ set tabstop=2
 " Set Backspace configuration
 "set backspace=2 " To work equal to the tabs
 "set backspace=indent,eol,start
+
+"-- FOLDING --
+set foldenable
+"set foldmethod=syntax "syntax highlighting items specify folds
+"set foldmethod=indent "syntax highlighting items specify folds
+"let g:javaScript_fold=1 "activate folding by JS syntax
+set foldlevelstart=99 "start file with all folds opened
+set foldcolumn=1 "defines 1 col at window left, to indicate folding
+"syntax enable
+"au FileType sh let g:sh_fold_enabled=7
+
  
 " Wrapping
 set breakindent
@@ -45,7 +56,9 @@ if has('termguicolors')
   set termguicolors " Active colors in terminal
 end
 
-if has('nvim-0.3.2') || has("patch-8.1.0360")
+if has('mac') && $VIM == '/usr/share/vim'
+	set diffopt-=internal
+elseif has('nvim-0.3.2') || has("patch-8.1.0360")
     set diffopt=filler,internal,algorithm:histogram,indent-heuristic
 endif
 

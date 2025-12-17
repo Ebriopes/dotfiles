@@ -1,5 +1,5 @@
 " Avoid use the config and map to other editor that doesn't NeoVim
-if !has('nvim')
+if !has('nvim') || !has('unix')
   finish
 endif
 
