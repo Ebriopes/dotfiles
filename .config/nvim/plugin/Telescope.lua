@@ -43,4 +43,7 @@ keymap("n", "<leader>ff", "<cmd>Telescope find_files<cr>", opts)
 keymap("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", opts)
 keymap("n", "<leader>fb", "<cmd>Telescope buffers<cr>", opts)
 keymap("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", opts)
+keymap("n", "<leader>fs", "<cmd>Telescope lsp_workspace_symbols<cr>", opts)
+keymap("n", "<leader>fsw", "<cmd>Telescope lsp_workspace_symbols<cr>", opts)
+keymap("n", "<leader>fsd", "<cmd>Telescope lsp_document_symbols<cr>", opts)
 

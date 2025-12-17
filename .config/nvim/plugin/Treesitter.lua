@@ -55,3 +55,19 @@ treesitter_conf.setup {
     additional_vim_regex_highlighting = false,
   },
 }
+
+-- Fold settings --
+vim.opt.foldmethod = 'expr'
+
+-- For Neovim v0.10.0+ it's recommended to use the core function
+if vim.fn.has('nvim-0.10.0') then
+  vim.opt.foldexpr = "vim.treesitter.foldexpr()"
+else
+  vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+  --vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  --vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  --vim.wo.foldmethod = 'expr'
+end
+
+vim.opt.foldlevelstart = 5 -- Puedes mantener esto
+vim.opt.foldcolumn = '1'     -- Puedes mantener esto

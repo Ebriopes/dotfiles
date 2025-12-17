@@ -45,7 +45,9 @@ if has('termguicolors')
   set termguicolors " Active colors in terminal
 end
 
-if has('nvim-0.3.2') || has("patch-8.1.0360")
+if has('mac') && $VIM == '/usr/share/vim'
+	set diffopt-=internal
+elseif has('nvim-0.3.2') || has("patch-8.1.0360")
     set diffopt=filler,internal,algorithm:histogram,indent-heuristic
 endif
 
@@ -56,4 +58,4 @@ colorscheme evening
 
 "If you need changes the colorscheme, I recomend you go to
 "./plugin/themes-config.vim
-silent! colorscheme everforest
+"silent! colorscheme everforest
