@@ -1,3 +1,5 @@
-# In the local .gitattributes file
-~/.config/nvim/* text eol=lf
+# In the local .gitattributes *.lua text eol=lf
+*.sh text eol=lf
+*.lua text eol=lf
+*.vim text eol=lf
 

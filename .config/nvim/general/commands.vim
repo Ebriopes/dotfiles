@@ -20,6 +20,17 @@ set tabstop=2
 " Set Backspace configuration
 "set backspace=2 " To work equal to the tabs
 "set backspace=indent,eol,start
+
+"-- FOLDING --
+set foldenable
+"set foldmethod=syntax "syntax highlighting items specify folds
+"set foldmethod=indent "syntax highlighting items specify folds
+"let g:javaScript_fold=1 "activate folding by JS syntax
+set foldlevelstart=99 "start file with all folds opened
+set foldcolumn=1 "defines 1 col at window left, to indicate folding
+"syntax enable
+"au FileType sh let g:sh_fold_enabled=7
+
  
 " Wrapping
 set breakindent
@@ -58,4 +69,4 @@ colorscheme evening
 
 "If you need changes the colorscheme, I recomend you go to
 "./plugin/themes-config.vim
-"silent! colorscheme everforest
+silent! colorscheme everforest
