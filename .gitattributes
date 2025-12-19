@@ -1,0 +1,3 @@
+# In the local .gitattributes file
+~/.config/nvim/* text eol=lf
+
