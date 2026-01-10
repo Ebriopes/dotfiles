@@ -1,7 +1,6 @@
 local is_installed, snacks = pcall(require, "snacks")
 
 if not is_installed then
-  print("snacks isn' available")
   return
 end
 

@@ -1,5 +1,4 @@
 local ok, saga = pcall(require, 'lspsaga')
---local saga_diag = require("lspsaga.diagnostic")
 
 if not ok then
   return

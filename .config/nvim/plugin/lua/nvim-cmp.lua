@@ -1,8 +1,8 @@
--- luasnip setup
-local luasnip = require 'luasnip'
-
 -- nvim-cmp setup
 local ok, cmp = pcall(require, 'cmp')
+
+-- luasnip setup
+local luasnip = require 'luasnip'
 
 if not ok then
   return

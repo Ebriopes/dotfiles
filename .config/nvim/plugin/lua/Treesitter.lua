@@ -8,7 +8,7 @@ end
 
 -- Fold settings --
 vim.opt.foldmethod = "expr"
-vim.opt.foldlevelstart = 5 -- Puedes mantener esto
+vim.opt.foldlevelstart = 0 -- Puedes mantener esto
 vim.opt.foldcolumn = "1" -- Puedes mantener esto
 
 if vim.fn.has("nvim-0.10.0") == 1 then

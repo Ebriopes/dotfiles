@@ -1,3 +1,17 @@
+local ok, mason = pcall(require, "mason")
+
+if not ok then
+  return
+end
+
+local ensure_install = { "angularls", "bashls", "cssls", "eslint", "graphql", "html", "jsonls", "pylsp", "sqlls", "lua_ls","vimls" }
+
+if vim.fn.has('nvim-0.8.0') == 1 then
+  vim.list_extend(ensure_install, {"ts_ls","biome"})
+else
+  vim.list_extend(ensure_install, {'tsserver'})
+end
+
 local DEFAULT_SETTINGS = {
   ui = {
     -- Whether to automatically check for new versions when opening the :Mason window.
@@ -67,19 +81,12 @@ local DEFAULT_SETTINGS = {
 }
 
 
-local ok, mason = pcall(require, "mason")
-
-if not ok then
-  return
-end
-
 mason.setup(DEFAULT_SETTINGS)
 
 require("mason-lspconfig").setup({
   -- A list of servers to automatically install if they're not already installed. Example: { "rust_analyzer@nightly", "sumneko_lua" }
   -- This setting has no relation with the `automatic_installation` setting.
-  ensure_installed = { "angularls", "bashls", "cssls", "eslint", "graphql", "html", "jsonls", "ts_ls", "lua_ls",
-    "pylsp", "sqlls", "vimls" },
+  ensure_installed = ensure_install,
 
   -- Whether servers that are set up (via lspconfig) should be automatically installed if they're not already installed.
   -- This setting has no relation with the `ensure_installed` setting.
