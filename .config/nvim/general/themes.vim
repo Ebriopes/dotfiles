@@ -20,5 +20,5 @@ let g:everforest_diagnostic_virtual_text = 'colored'
 
 " SELECT YOUR THEME
 " If you add one theme execute it with silent! prefix to avoid error messages in case of be missing
+silent! colorscheme nord
 silent! colorscheme everforest
-"silent! colorscheme nord

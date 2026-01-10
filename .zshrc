@@ -128,7 +128,7 @@ source $ZSH/oh-my-zsh.sh
 export NODE_OPTIONS="--max-old-space-size=16384"
 
 export PATH="$PATH:/usr/local/bin"
-#export PATH="$PATH:/Users/daniel/.local/bin" #Add it in .zprofile
+export PATH="$PATH:$HOME/.local/bin" #Add it in .zprofile
 
 ##########         Functions         ##########
 # Función de autocompletado
@@ -154,9 +154,10 @@ alias features="cd ~/Documents/Repos/Features"
 # Redirects
 alias python='python3'
 # Commands
+alias ls='ls -l --colo=always -h'
 alias cd=cd_tree
 alias tree='tree --dirsfirst --du -hlC -L1'
-alias lt='tree -aFL 1'
+alias lt='tree -aFL1'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
 
 ########## Tool Config ########## 
@@ -177,6 +178,7 @@ export NVM_DIR="$HOME/.nvm"
 
 #autoload -U compinit && compinit
 eval "$(register-python-argcomplete pipx)"
+eval "$(zoxide init zsh)"
 
 
 ########## MAC Config ##########

@@ -113,45 +113,57 @@ saga.setup({
 -- when you use action in finder like open vsplit then you can
 -- use <C-t> to jump back
 keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
-
 -- Code action
 keymap({ "n", "v" }, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
-
 -- Rename
 keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
-
 -- Peek Definition
 keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", { silent = true })
-
 -- Show line diagnostics
 keymap("n", "<leader>cd", "<cmd>Lspsaga show_line_diagnostics<CR>", { silent = true })
-
 -- Show cursor diagnostic
 --keymap("n", "<leader>cd", "<cmd>Lspsaga show_cursor_diagnostics<CR>", { silent = true })
-
 -- Diagnsotic jump can use `<c-o>` to jump back
 keymap("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", { silent = true })
 keymap("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", { silent = true })
-
 -- Only jump to error
-keymap("n", "[E", function()
-  require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
-end, { silent = true })
-keymap("n", "]E", function()
-  require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { silent = true })
-
+keymap("n", "[E", function() require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR }) end, { silent = true })
+keymap("n", "]E", function() require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR }) end, { silent = true })
 -- Outline
 keymap("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", { silent = true })
-
 -- Hover Doc
 keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
 
+
+--
 -- Float terminal
-keymap("n", "<D-i>", "<cmd>Lspsaga term_toggle<CR>", { silent = true })
+--
+local term_toggle_key = '<D-i>'
+
+if vim.fn.has('win32') == 1 then
+  term_toggle_key = '<A-i>'
+end
+
+keymap("n", term_toggle_key, "<cmd>Lspsaga term_toggle<CR>", { silent = true })
 -- if you want pass somc cli command into terminal you can do like this
 -- open lazygit in lspsaga float terminal
 --keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm lazygit<CR>", { silent = true })
 -- close floaterm
-keymap("t", "<D-i>", [[<C-\><C-n><cmd>Lspsaga term_toggle<CR>]], { silent = true })
+keymap("t", term_toggle_key, [[<C-\><C-n><cmd>Lspsaga term_toggle<CR>]], { silent = true })
 
+
+vim.keymap.set("n", "<leader>lc", function()
+  -- Use vim.ui.select to show a list of active LSP clients
+  vim.ui.select(vim.lsp.get_active_clients(), {
+    prompt = "Select an active LSP client:",
+    format_item = function(client)
+      return client.name
+    end
+  }, function(client)
+    if client then
+      -- Optional: Perform an action with the selected client, e.g., show diagnostics
+      vim.notify("Selected client: " .. client.name, vim.log.levels.INFO)
+      -- You can define further logic here
+    end
+  end)
+end, { desc = "List and select active LSP clients" })

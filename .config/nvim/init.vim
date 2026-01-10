@@ -21,6 +21,7 @@ let s:list_files = [
       \'mapping',
       \'plugins',
       \'commands',
+      \'themes',
       \]
 
 for s:item in s:list_files

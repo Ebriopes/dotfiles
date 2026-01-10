@@ -1,10 +1,11 @@
 " Avoid use the config and map to other editor that doesn't NeoVim
-if !has('nvim')
+if !has('nvim') || !has('unix')
   finish
 endif
 
 " Make Ranger replace Netrw and be the file explorer
-let g:rnvimr_enable_ex = 1
+"let g:rnvimr_enable_ex = 1
+let g:rnvimr_enable_ex = 0
 
 "" Make Ranger to be hidden after picking a file
 let g:rnvimr_enable_picker = 1
