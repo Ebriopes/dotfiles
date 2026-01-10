@@ -1,606 +1,272 @@
-# Configura el HOME del usuario usando un repositorio Git bare en PowerShell.
+# =============================================================================
+# Script de Instalación de Dotfiles para Windows PowerShell
+#
+# Configura el directorio HOME del usuario para ser gestionado por un 
+# repositorio Git bare, permitiendo el control de versiones de los archivos 
+# de configuración ("dotfiles").
+# =============================================================================
 
-# Configuración de manejo de errores: detiene el script en caso de error.
+################################################################################
+# TODO
+# Crear enlaces a los archivos de la configuracion, 
+# tales como los archivos Powershell $PROFILE
+################################################################################
+
+# --- Configuración del Script ---
+# Detiene la ejecución del script inmediatamente si ocurre un error.
 $ErrorActionPreference = 'Stop'
+# Activa el modo estricto para detectar errores comunes.
 Set-StrictMode -Version Latest
 
+# Asegurar que la salida de Git esté en inglés para que el análisis de texto (regex) funcione correctamente.
+$env:LC_ALL = 'C'
+
 # --- Variables Globales ---
-$HOME_CFG = Join-Path $HOME ".cfg" # Ruta para el repositorio bare.
-$CONFIG_BACKUP = Join-Path $HOME ".config\backup" # Ruta para el backup.
-$GIT_BIN = "git" # El comando 'git' debe estar en el PATH.
-# En PowerShell, el perfil del usuario es el archivo de configuración de la shell.
-$SHELL_CONFIG_FILE = $PROFILE
-$DOTFILES_GIT_FUNCTION_NAME = "dotfiles-git" # Nuevo nombre para la función alias de Git
+$DotfilesRepoUrl = "https://github.com/Ebriopes/dotfiles.git"
+$DotfilesBranch = "windows"
+$HomeBareRepoPath = Join-Path $HOME ".cfg"
+$BackupPath = Join-Path $HOME ".config-backup"
+$GitCommand = "git"
+$GitAliasName = "dotfiles" # Alias más corto y común para esta técnica.
 
-# --- Funciones ---
-
-# Función para ejecutar comandos de git en el repositorio bare.
-# Esta función es para comandos que operan *dentro* del repositorio bare ya creado.
-function Invoke-GitConfig {
-    param(
-        [Parameter(Mandatory=$true, Position=0)]
-        [string[]]$Arguments
-    )
-    # Asegúrate de que $GIT_BIN esté disponible en el PATH.
-    & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" @Arguments
+# --- Verificación de Prerrequisitos ---
+if (-not (Get-Command $GitCommand -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "Error: Git no está instalado o no se encuentra en el PATH del sistema."
+    exit 1
 }
 
-# Función para imprimir mensajes con color.
-function Write-ColoredMessage {
+# --- Funciones Auxiliares ---
+
+function Write-Styled {
     param(
         [Parameter(Mandatory=$true)]
+        [ValidateSet("Info", "Warning", "Error", "Success", "Section")]
         [string]$Type,
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    switch ($Type) {
-        "info" { Write-Host -ForegroundColor Green $Message }
-        "warning" { Write-Host -ForegroundColor Yellow $Message }
-        "error" {
-            Write-Host -ForegroundColor Red $Message
-            exit 1
+    
+    $colorMap = @{
+        "Info"    = "Cyan"
+        "Warning" = "Yellow"
+        "Error"   = "Red"
+        "Success" = "Green"
+        "Section" = "Magenta"
+    }
+    
+    if ($Type -eq "Section") {
+        Write-Host ""
+        Write-Host -ForegroundColor $colorMap[$Type] "--- $Message ---"
+    } else {
+        Write-Host -ForegroundColor $colorMap[$Type] "[$Type] $Message"
+    }
+
+    if ($Type -eq "Error") {
+        # Termina el script en caso de error gestionado.
+        exit 1
+    }
+}
+
+function Invoke-DotfilesGit {
+    param(
+        [Parameter(Mandatory=$true, ValueFromRemainingArguments=$true)]
+        [string[]]$Arguments
+    )
+    # Ejecuta cualquier comando Git apuntando al repositorio bare y al work-tree del HOME.
+    & $GitCommand --git-dir="$HomeBareRepoPath" --work-tree="$HOME" @Arguments
+}
+
+# --- Lógica Principal de Instalación ---
+
+function Get-CheckoutConflicts {
+    Write-Styled -Type "Info" "Buscando conflictos de archivos (archivos existentes no rastreados)..."
+    
+    try {
+        # Simulamos un checkout para que Git nos diga qué archivos serían sobrescritos.
+        # Redirigimos el stream de error (2) al de éxito (1) para capturarlo todo.
+        $checkoutOutput = Invoke-DotfilesGit checkout 2>&1
+    } catch {
+        # $checkoutOutput contendrá el mensaje de error de la excepción.
+        $checkoutOutput = $_.Exception.Message
+    }
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Styled -Type "Success" "No se encontraron conflictos."
+        return @() # Devuelve un array vacío si no hay conflictos.
+    }
+    
+    $conflictingFiles = @()
+    $isConflictError = $false
+
+    # Procesamos la salida línea por línea.
+    foreach ($line in ($checkoutOutput -split [System.Environment]::NewLine)) {
+        if ($line -match "error: The following untracked working tree files would be overwritten by checkout:") {
+            $isConflictError = $true
+            continue
         }
-        default { Write-Host $Message }
-    }
-}
-
-# Función para mostrar el menú y obtener la opción seleccionada.
-function Show-Menu {
-    Write-ColoredMessage -Type "info" "Configurando tu HOME desde el repositorio Git bare..."
-    Write-Host "`n`e[1;33mMenú de Configuración de HOME`e[0m"
-    Write-Host "1. Ejecutar el proceso completo automáticamente"
-    Write-Host "2. Ejecutar paso a paso"
-    Write-Host "3. Salir"
-
-    $opcion = Read-Host -Prompt "Seleccione una opción"
-    Write-Host "" # Nueva línea
-
-    # Validación de la entrada.
-    if (-not ($opcion -match "^[1-3]$")) {
-        Write-ColoredMessage -Type "error" "Opción inválida. Saliendo del script."
+        
+        if ($isConflictError -and ($line -match "^\s+(.+)$")) {
+            # Capturamos cada archivo que Git reporta.
+            $conflictingFiles += $Matches[1].Trim()
+        }
     }
 
-    Write-Host "Opción seleccionada: $opcion" # Mensaje de depuración
-    return $opcion
+    if (-not $isConflictError) {
+        Write-Styled -Type "Error" "Ocurrió un error inesperado durante el `git checkout`. Detalles:`n$checkoutOutput` "
+    }
+    
+    return $conflictingFiles
 }
 
-# Función para respaldar o eliminar archivos.
-function Handle-BackupFiles {
+function Handle-ConflictingFiles {
     param(
         [Parameter(Mandatory=$true)]
-        [string[]]$FilesToHandle # Array de rutas de archivos
+        [string[]]$Files
     )
 
-    if ($FilesToHandle.Length -gt 0) {
-        Write-ColoredMessage -Type "warning" "Se encontraron archivos sin seguimiento que podrían ser sobrescritos."
-        $respuesta = Read-Host -Prompt "¿Desea [r]espaldarlos, [e]liminarlos, o [a]bortar? (r/e/a)"
-        Write-Host "" # Nueva línea
+    Write-Styled -Type "Warning" "Se encontraron los siguientes archivos que entrarían en conflicto:"
+    $Files | ForEach-Object { Write-Host "  - $_" }
+    
+    $options = [System.Management.Automation.Host.ChoiceDescription[]]@(
+        "&Respaldar (Mover a $BackupPath)",
+        "&Eliminar (Borrarlos permanentemente)",
+        "&Abortar instalación"
+    )
+    $choice = $Host.UI.PromptForChoice("Acción requerida", "¿Qué deseas hacer con estos archivos?", $options, 2)
 
-        switch ($respuesta.ToLower()) {
-            "r" {
-                Write-ColoredMessage -Type "info" "Respaldando archivos..."
-                foreach ($file in $FilesToHandle) {
-                    $sourcePath = Join-Path $HOME $file
-                    $destinationPath = Join-Path $CONFIG_BACKUP $file
-                    
-                    # Asegurarse de que el directorio destino exista
-                    $destinationDir = Split-Path $destinationPath -Parent
-                    if (-not (Test-Path $destinationDir -PathType Container)) {
-                        New-Item -ItemType Directory -Path $destinationDir -Force | Out-Null
-                    }
-
-                    Write-ColoredMessage -Type "warning" "Respaldando $sourcePath en $destinationPath..."
-                    try {
-                        Move-Item -Path $sourcePath -Destination $destinationPath -Force
-                        Write-ColoredMessage -Type "info" "$sourcePath respaldado exitosamente en $destinationPath"
-                    } catch {
-                        Write-ColoredMessage -Type "error" "No se pudo respaldar $sourcePath. Error: $($_.Exception.Message)"
-                    }
+    switch ($choice) {
+        0 { # Respaldar
+            Write-Styled -Type "Info" "Respaldando archivos en '$BackupPath'..."
+            if (-not (Test-Path $BackupPath)) {
+                New-Item -ItemType Directory -Path $BackupPath -Force | Out-Null
+            }
+            foreach ($file in $Files) {
+                $source = Join-Path $HOME $file
+                # Para preservar la estructura de directorios en el backup.
+                $destination = Join-Path $BackupPath $file
+                
+                $destDir = Split-Path $destination -Parent
+                if (-not (Test-Path $destDir)) {
+                    New-Item -ItemType Directory -Path $destDir -Force | Out-Null
                 }
+                
+                Write-Host "Moviendo '$source' a '$destination'..."
+                Move-Item -Path $source -Destination $destination -Force
             }
-            "e" {
-                Write-ColoredMessage -Type "warning" "Eliminando archivos sin seguimiento..."
-                foreach ($file in $FilesToHandle) {
-                    $targetPath = Join-Path $HOME $file
-                    Write-ColoredMessage -Type "warning" "Eliminando $targetPath..."
-                    try {
-                        Remove-Item -Path $targetPath -Recurse -Force
-                        Write-ColoredMessage -Type "info" "$targetPath eliminado."
-                    } catch {
-                        Write-ColoredMessage -Type "error" "No se pudo eliminar $targetPath. Error: $($_.Exception.Message)"
-                    }
-                    # Si el archivo era un directorio y se eliminó, asegúrate de que no quede referencia
-                    if (Test-Path $targetPath -PathType Container) {
-                        # Esto es solo una precaución, Remove-Item -Recurse debería manejarlo
-                    }
-                }
-            }
-            "a" {
-                Write-ColoredMessage -Type "error" "Operación abortada por el usuario."
-            }
-            default {
-                Write-ColoredMessage -Type "error" "Opción inválida. Abortando."
-            }
+            Write-Styled -Type "Success" "Todos los archivos en conflicto han sido respaldados."
         }
+        1 { # Eliminar
+            Write-Styled -Type "Warning" "Eliminando archivos en conflicto..."
+            foreach ($file in $Files) {
+                $target = Join-Path $HOME $file
+                Write-Host "Eliminando '$target'..."
+                Remove-Item -Path $target -Recurse -Force
+            }
+            Write-Styled -Type "Success" "Todos los archivos en conflicto han sido eliminados."
+        }
+        2 { # Abortar
+            Write-Styled -Type "Error" "Instalación abortada por el usuario."
+        }
+    }
+}
+
+function Start-DotfilesInstallation {
+    param(
+        [switch]$StepByStep
+    )
+    
+    $PauseAction = {
+        if ($StepByStep) {
+            Read-Host "Presiona Enter para continuar con el siguiente paso..." | Out-Null
+        }
+    }
+
+    # -- PASO 1: Clonar Repositorio --
+    Write-Styled -Type "Section" "Paso 1: Clonar Repositorio Bare"
+    if (Test-Path $HomeBareRepoPath) {
+        Write-Styled -Type "Warning" "El directorio '$HomeBareRepoPath' ya existe. Se asumirá que es el repositorio correcto."
     } else {
-        Write-ColoredMessage -Type "info" "No hay archivos que respaldar o eliminar."
+        Write-Styled -Type "Info" "Clonando '$DotfilesRepoUrl' en '$HomeBareRepoPath'..."
+        try {
+            & $GitCommand clone --bare --branch "$DotfilesBranch" "$DotfilesRepoUrl" "$HomeBareRepoPath"
+            Write-Styled -Type "Success" "Repositorio clonado exitosamente."
+        } catch {
+            Write-Styled -Type "Error" "No se pudo clonar el repositorio. Error: $($_.Exception.Message)"
+        }
     }
+    & $PauseAction
+    
+    # -- PASO 2: Crear Alias en el Perfil de PowerShell --
+    Write-Styled -Type "Section" "Paso 2: Configurar alias '$GitAliasName'"
+    $profilePath = $PROFILE
+    
+    # Asegurar que el directorio del perfil exista antes de intentar crear el archivo
+    $profileDir = Split-Path -Parent $profilePath
+    if (-not (Test-Path $profileDir)) {
+        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+    }
+
+    if (-not (Test-Path $profilePath)) {
+        Write-Styled -Type "Info" "Creando archivo de perfil en '$profilePath'..."
+        New-Item -Path $profilePath -ItemType File -Force | Out-Null
+    }
+    
+    $aliasFunction = "function $($GitAliasName) { & git --git-dir='$HomeBareRepoPath' --work-tree='$HOME' `$args }"
+    if (Select-String -Path $profilePath -Pattern $GitAliasName -Quiet) {
+        Write-Styled -Type "Warning" "La función/alias '$GitAliasName' ya parece existir en tu perfil. No se realizarán cambios."
+    } else {
+        Write-Styled -Type "Info" "Añadiendo función '$GitAliasName' a tu perfil de PowerShell."
+        Add-Content -Path $profilePath -Value "`n# Alias para gestionar dotfiles`n$aliasFunction"
+        Write-Styled -Type "Success" "Alias añadido. Deberás reiniciar tu terminal para usarlo."
+    }
+    & $PauseAction
+
+    # -- PASO 3: Configurar Repositorio Local --
+    Write-Styled -Type "Section" "Paso 3: Configurar Repositorio Local"
+    Write-Styled -Type "Info" "Configurando 'status.showUntrackedFiles' en 'no' para ocultar archivos no rastreados."
+    try {
+        Invoke-DotfilesGit config status.showUntrackedFiles no
+        Write-Styled -Type "Success" "Configuración aplicada."
+    } catch {
+        Write-Styled -Type "Error" "No se pudo aplicar la configuración de Git. Error: $($_.Exception.Message)"
+    }
+    & $PauseAction
+
+    # -- PASO 4: Respaldar Archivos en Conflicto --
+    Write-Styled -Type "Section" "Paso 4: Verificar y Resolver Conflictos"
+    $conflictingFiles = @(Get-CheckoutConflicts)
+    if ($conflictingFiles.Count -gt 0) {
+        Handle-ConflictingFiles -Files $conflictingFiles
+    }
+    & $PauseAction
+    
+    # -- PASO 5: Aplicar los Dotfiles --
+    Write-Styled -Type "Section" "Paso 5: Aplicar los Dotfiles (Checkout)"
+    Write-Styled -Type "Info" "Realizando el checkout de los archivos en tu directorio HOME..."
+    try {
+        Invoke-DotfilesGit checkout
+        Write-Styled -Type "Success" "¡Checkout completado! Tus dotfiles están en su sitio."
+    } catch {
+        Write-Styled -Type "Error" "Falló el checkout final. Puede que aún haya conflictos. Error: $($_.Exception.Message)"
+    }
+
+    # -- FINALIZACIÓN --
+    Write-Styled -Type "Section" "Instalación Finalizada"
+    Write-Styled -Type "Success" "El proceso ha terminado. Por favor, reinicia tu terminal para que el alias '$GitAliasName' esté disponible."
+    Write-Styled -Type "Info" "Puedes gestionar tus dotfiles con comandos como: '$GitAliasName status', '$GitAliasName add .', etc."
 }
 
-# --- Lógica Principal del Script ---
 
-# Mostrar el menú y obtener la opción del usuario.
-$selectedOption = Show-Menu
+# --- Menú Principal ---
+$menuOptions = [System.Management.Automation.Host.ChoiceDescription[]]@(
+    "&Instalación automática",
+    "Instalación &paso a paso",
+    "&Salir"
+)
+$choice = $Host.UI.PromptForChoice("Instalador de Dotfiles", "Bienvenido. ¿Cómo quieres proceder?", $menuOptions, 2)
 
-# Ejecutar la opción seleccionada.
-switch ($selectedOption) {
-    "1" {
-        Write-ColoredMessage -Type "info" "Ejecutando el proceso completo automáticamente..."
-
-        # 1. Eliminar la configuración anterior (si existe).
-        Write-ColoredMessage -Type "info" "Paso 1: Eliminar configuración anterior (si existe)."
-        if (Test-Path $HOME_CFG -PathType Container) {
-            Write-ColoredMessage -Type "warning" "Se ha encontrado una configuración anterior en $HOME_CFG."
-            $respuesta = Read-Host -Prompt "¿Desea eliminarla? (s/n)"
-            Write-Host "" # Nueva línea
-            if ($respuesta.ToLower() -eq "s") {
-                Write-ColoredMessage -Type "warning" "Eliminando configuración anterior en $HOME_CFG..."
-                try {
-                    Remove-Item -Path $HOME_CFG -Recurse -Force
-                    Write-ColoredMessage -Type "info" "Configuración anterior eliminada."
-                } catch {
-                    Write-ColoredMessage -Type "error" "No se pudo eliminar la configuración anterior en $HOME_CFG. Error: $($_.Exception.Message)"
-                }
-            } else {
-                Write-ColoredMessage -Type "warning" "La configuración anterior se mantendrá."
-            }
-        }
-
-        # 2. Clonar o inicializar el repositorio bare.
-        Write-ColoredMessage -Type "info" "Paso 2: Clonar o inicializar el repositorio bare."
-        if (-not (Test-Path $HOME_CFG -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Clonando el repositorio bare en $HOME_CFG..."
-            try {
-                # Directamente usar git clone, sin Invoke-GitConfig, ya que no opera *dentro* de un repo existente.
-                & $GIT_BIN clone --bare "https://github.com/Ebriopes/dotfiles.git" "$HOME_CFG"
-                Write-ColoredMessage -Type "info" "Repositorio bare clonado exitosamente en $HOME_CFG."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo clonar el repositorio bare. Error: $($_.Exception.Message)"
-            }
-        } else {
-             Write-ColoredMessage -Type "warning" "Inicializando un repositorio bare existente en $HOME_CFG..."
-             try {
-                 # Si el directorio ya existe, asumimos que es el repositorio bare.
-                 Write-ColoredMessage -Type "info" "El directorio $HOME_CFG ya existe. Asumiendo que es el repositorio bare."
-             } catch {
-                 Write-ColoredMessage -Type "error" "No se pudo inicializar el repositorio bare. Error: $($_.Exception.Message)"
-             }
-        }
-
-
-        # 3. Crear un alias para el comando git (en PowerShell, es una función o alias de PowerShell)
-        Write-ColoredMessage -Type "info" "Paso 3: Configurar alias para el comando git..."
-        # El archivo de perfil de PowerShell es la ubicación estándar para alias/funciones.
-        if (-not (Test-Path $SHELL_CONFIG_FILE)) {
-            New-Item -Path $SHELL_CONFIG_FILE -ItemType File -Force | Out-Null
-        }
-
-        # Usar el nuevo nombre de la función
-        $aliasContent = "function $($DOTFILES_GIT_FUNCTION_NAME) { & git --git-dir='$HOME_CFG/' --work-tree='$HOME' `$args }"
-        # Usar Select-String con -Raw para buscar la línea completa y evitar problemas con caracteres especiales
-        if (-not (Get-Content $SHELL_CONFIG_FILE -Raw | Select-String -Pattern "^function $($DOTFILES_GIT_FUNCTION_NAME) {" -Quiet)) {
-            try {
-                Add-Content -Path $SHELL_CONFIG_FILE -Value $aliasContent
-                Write-ColoredMessage -Type "info" "Función '$($DOTFILES_GIT_FUNCTION_NAME)' agregada a $SHELL_CONFIG_FILE. Reinicia PowerShell para que tenga efecto."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo agregar la función '$($DOTFILES_GIT_FUNCTION_NAME)' a $SHELL_CONFIG_FILE. Error: $($_.Exception.Message)"
-            }
-        } else {
-            Write-ColoredMessage -Type "warning" "La función '$($DOTFILES_GIT_FUNCTION_NAME)' ya existe en $SHELL_CONFIG_FILE. No se modificará."
-        }
-
-        # 4. Desactivar el seguimiento de archivos no rastreados.
-        Write-ColoredMessage -Type "info" "Paso 4: Desactivar el seguimiento de archivos no rastreados."
-        Write-ColoredMessage -Type "warning" "Desactivando el seguimiento de archivos no rastreados..."
-        try {
-            # Llamar directamente a git config con los parámetros --git-dir y --work-tree
-            & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" config status.showUntrackedFiles no
-            Write-ColoredMessage -Type "info" "No tracking files."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo desactivar el seguimiento de archivos no rastreados. Error: $($_.Exception.Message)"
-        }
-
-        # 5. Crear el directorio de respaldo (si no existe).
-        Write-ColoredMessage -Type "info" "Paso 5: Crear el directorio de respaldo."
-        if (-not (Test-Path $CONFIG_BACKUP -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Creando directorio de respaldo en $CONFIG_BACKUP..."
-            try {
-                New-Item -ItemType Directory -Path $CONFIG_BACKUP -Force | Out-Null
-                Write-ColoredMessage -Type "info" "Directorio de respaldo creado exitosamente en $CONFIG_BACKUP."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo crear el directorio de respaldo. Error: $($_.Exception.Message)"
-            }
-        }
-
-        # 6. Respaldar archivos de configuración.
-        Write-ColoredMessage -Type "info" "Paso 6: Respaldar archivos de configuración."
-        Write-ColoredMessage -Type "warning" "Respaldando archivos de configuración en $CONFIG_BACKUP..."
-
-        # --- CORRECCIÓN AQUÍ: Manejo más robusto de la salida de git checkout ---
-        $gitCheckoutOutput = ""
-        $gitExitCode = 0
-        try {
-            # Ejecutar git checkout y capturar la salida y el código de salida.
-            # El 2>&1 redirige stderr a stdout, y Out-String lo captura como una sola cadena.
-            # El bloque script { ... } permite que $ErrorActionPreference no detenga la ejecución aquí.
-            $gitCheckoutResult = & {
-                & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" checkout 2>&1
-            }
-            $gitCheckoutOutput = $gitCheckoutResult | Out-String
-            $gitExitCode = $LASTEXITCODE # Captura el código de salida del último comando externo
-        } catch {
-            # Esto atraparía errores de PowerShell si el comando git no se encuentra, etc.
-            Write-ColoredMessage -Type "error" "Error inesperado al ejecutar 'git checkout' para obtener la lista de archivos: $($_.Exception.Message)"
-            exit 1
-        }
-
-        $backupFilesList = @()
-        $inUntrackedSection = $false
-        $isExpectedGitWarning = $false
-
-        # Verificar si la salida contiene la advertencia esperada de Git
-        if ($gitCheckoutOutput -match "error: The following untracked working tree files would be overwritten by checkout:") {
-            $isExpectedGitWarning = $true
-            # Procesar la salida para extraer los nombres de los archivos
-            foreach ($line in ($gitCheckoutOutput -split "`n")) {
-                if ($line -match "error: The following untracked working tree files would be overwritten by checkout:") {
-                    $inUntrackedSection = $true
-                    continue
-                }
-                if ($inUntrackedSection -and $line -match "^\s+\./(.+)$") {
-                    $backupFilesList += $Matches[1].Trim()
-                } elseif ($inUntrackedSection -and $line.Trim() -eq "") {
-                    break
-                }
-            }
-        }
-        
-        # Si Git salió con un código de error Y NO es la advertencia esperada, entonces es un error real.
-        if ($gitExitCode -ne 0 -and -not $isExpectedGitWarning) {
-            Write-ColoredMessage -Type "error" "Error inesperado de Git al obtener la lista de archivos: $($gitCheckoutOutput)"
-        } elseif ($backupFilesList.Length -gt 0) {
-            # Si hay archivos para respaldar (ya sea por la advertencia esperada o por otros motivos)
-            Handle-BackupFiles -FilesToHandle $backupFilesList
-        } else {
-            Write-ColoredMessage -Type "info" "No hay archivos que respaldar o eliminar."
-        }
-        # --- FIN CORRECCIÓN ---
-
-        # 7. Hacer checkout de la configuración.
-        Write-ColoredMessage -Type "info" "Paso 7: Hacer checkout de la configuración."
-        Write-ColoredMessage -Type "warning" "Haciendo checkout de la configuración..."
-        try {
-            Invoke-GitConfig checkout | Out-Null # Suprimimos la salida
-            Write-ColoredMessage -Type "info" "Configuración aplicada exitosamente."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo hacer checkout de la configuración. Por favor, revisa si hay conflictos manualmente. Error: $($_.Exception.Message)"
-        }
-
-        Write-ColoredMessage -Type "info" "¡Configuración de HOME completada!"
-    }
-    "2" {
-        Write-ColoredMessage -Type "info" "Ejecutando el proceso paso a paso. Por favor, siga las instrucciones:"
-
-        # 1. Eliminar la configuración anterior (si existe).
-        Write-ColoredMessage -Type "info" "Paso 1: Eliminar configuración anterior (si existe)."
-        if (Test-Path $HOME_CFG -PathType Container) {
-            Write-ColoredMessage -Type "warning" "Se ha encontrado una configuración anterior en $HOME_CFG."
-            $respuesta = Read-Host -Prompt "¿Desea eliminarla? (s/n)"
-            Write-Host "" # Nueva línea
-            if ($respuesta.ToLower() -eq "s") {
-                Write-ColoredMessage -Type "warning" "Eliminando configuración anterior en $HOME_CFG..."
-                try {
-                    Remove-Item -Path $HOME_CFG -Recurse -Force
-                    Write-ColoredMessage -Type "info" "Configuración anterior eliminada."
-                } catch {
-                    Write-ColoredMessage -Type "error" "No se pudo eliminar la configuración anterior en $HOME_CFG. Error: $($_.Exception.Message)"
-                }
-            } else {
-                Write-ColoredMessage -Type "warning" "La configuración anterior se mantendrá."
-            }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 2..." | Out-Null
-
-        # 2. Clonar o inicializar el repositorio bare.
-        Write-ColoredMessage -Type "info" "Paso 2: Clonar o inicializar el repositorio bare."
-        if (-not (Test-Path $HOME_CFG -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Clonando el repositorio bare en $HOME_CFG..."
-            try {
-                # Directamente usar git clone, sin Invoke-GitConfig
-                & $GIT_BIN clone --bare "https://github.com/Ebriopes/dotfiles.git" "$HOME_CFG"
-                Write-ColoredMessage -Type "info" "Repositorio bare clonado exitosamente en $HOME_CFG."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo clonar el repositorio bare. Error: $($_.Exception.Message)"
-            }
-        } else {
-             Write-ColoredMessage -Type "warning" "Inicializando un repositorio bare existente en $HOME_CFG..."
-             try {
-                 Write-ColoredMessage -Type "info" "El directorio $HOME_CFG ya existe. Asumiendo que es el repositorio bare."
-             } catch {
-                 Write-ColoredMessage -Type "error" "No se pudo inicializar el repositorio bare. Error: $($_.Exception.Message)"
-             }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 3..." | Out-Null
-
-        # 3. Crear un alias para el comando git (en PowerShell, es una función o alias de PowerShell)
-        Write-ColoredMessage -Type "info" "Paso 3: Configurar alias para el comando git..."
-        if (-not (Test-Path $SHELL_CONFIG_FILE)) {
-            New-Item -ItemType File -Force | Out-Null
-        }
-
-        # Usar el nuevo nombre de la función
-        $aliasContent = "function $($DOTFILES_GIT_FUNCTION_NAME) { & git --git-dir='$HOME_CFG/' --work-tree='$HOME' `$args }"
-        # Usar Select-String con -Raw para buscar la línea completa y evitar problemas con caracteres especiales
-        if (-not (Get-Content $SHELL_CONFIG_FILE -Raw | Select-String -Pattern "^function $($DOTFILES_GIT_FUNCTION_NAME) {" -Quiet)) {
-            try {
-                Add-Content -Path $SHELL_CONFIG_FILE -Value $aliasContent
-                Write-ColoredMessage -Type "info" "Función '$($DOTFILES_GIT_FUNCTION_NAME)' agregada a $SHELL_CONFIG_FILE. Reinicia PowerShell para que tenga efecto."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo agregar la función '$($DOTFILES_GIT_FUNCTION_NAME)' a $SHELL_CONFIG_FILE. Error: $($_.Exception.Message)"
-            }
-        } else {
-            Write-ColoredMessage -Type "warning" "La función '$($DOTFILES_GIT_FUNCTION_NAME)' ya existe en $SHELL_CONFIG_FILE. No se modificará."
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 4..." | Out-Null
-
-        # 4. Desactivar el seguimiento de archivos no rastreados.
-        Write-ColoredMessage -Type "info" "Paso 4: Desactivar el seguimiento de archivos no rastreados."
-        Write-ColoredMessage -Type "warning" "Desactivando el seguimiento de archivos no rastreados..."
-        try {
-            & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" config status.showUntrackedFiles no
-            Write-ColoredMessage -Type "info" "No tracking files."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo desactivar el seguimiento de archivos no rastreados. Error: $($_.Exception.Message)"
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 5..." | Out-Null
-
-        # 5. Crear el directorio de respaldo (si no existe).
-        Write-ColoredMessage -Type "info" "Paso 5: Crear el directorio de respaldo."
-        if (-not (Test-Path $CONFIG_BACKUP -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Creando directorio de respaldo en $CONFIG_BACKUP..."
-            try {
-                New-Item -ItemType Directory -Path $CONFIG_BACKUP -Force | Out-Null
-                Write-ColoredMessage -Type "info" "Directorio de respaldo creado exitosamente en $CONFIG_BACKUP."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo crear el directorio de respaldo. Error: $($_.Exception.Message)"
-            }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 6..." | Out-Null
-
-        # 6. Respaldar archivos de configuración.
-        Write-ColoredMessage -Type "info" "Paso 6: Respaldar archivos de configuración."
-        Write-ColoredMessage -Type "warning" "Respaldando archivos de configuración en $CONFIG_BACKUP..."
-
-        # --- CORRECCIÓN AQUÍ: Manejo más robusto de la salida de git checkout ---
-        $gitCheckoutOutput = ""
-        $gitExitCode = 0
-        try {
-            # Ejecutar git checkout y capturar la salida y el código de salida.
-            # El 2>&1 redirige stderr a stdout, y Out-String lo captura como una sola cadena.
-            # El bloque script { ... } permite que $ErrorActionPreference no detenga la ejecución aquí.
-            $gitCheckoutResult = & {
-                & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" checkout 2>&1
-            }
-            $gitCheckoutOutput = $gitCheckoutResult | Out-String
-            $gitExitCode = $LASTEXITCODE # Captura el código de salida del último comando externo
-        } catch {
-            # Esto atraparía errores de PowerShell si el comando git no se encuentra, etc.
-            Write-ColoredMessage -Type "error" "Error inesperado al ejecutar 'git checkout' para obtener la lista de archivos: $($_.Exception.Message)"
-            exit 1
-        }
-
-        $backupFilesList = @()
-        $inUntrackedSection = $false
-        $isExpectedGitWarning = $false
-
-        # Verificar si la salida contiene la advertencia esperada de Git
-        if ($gitCheckoutOutput -match "error: The following untracked working tree files would be overwritten by checkout:") {
-            $isExpectedGitWarning = $true
-            # Procesar la salida para extraer los nombres de los archivos
-            foreach ($line in ($gitCheckoutOutput -split "`n")) {
-                if ($line -match "error: The following untracked working tree files would be overwritten by checkout:") {
-                    $inUntrackedSection = $true
-                    continue
-                }
-                if ($inUntrackedSection -and $line -match "^\s+\./(.+)$") {
-                    $backupFilesList += $Matches[1].Trim()
-                } elseif ($inUntrackedSection -and $line.Trim() -eq "") {
-                    break
-                }
-            }
-        }
-        
-        # Si Git salió con un código de error Y NO es la advertencia esperada, entonces es un error real.
-        if ($gitExitCode -ne 0 -and -not $isExpectedGitWarning) {
-            Write-ColoredMessage -Type "error" "Error inesperado de Git al obtener la lista de archivos: $($gitCheckoutOutput)"
-        } elseif ($backupFilesList.Length -gt 0) {
-            # Si hay archivos para respaldar (ya sea por la advertencia esperada o por otros motivos)
-            Handle-BackupFiles -FilesToHandle $backupFilesList
-        } else {
-            Write-ColoredMessage -Type "info" "No hay archivos que respaldar o eliminar."
-        }
-        # --- FIN CORRECCIÓN ---
-
-        # 7. Hacer checkout de la configuración.
-        Write-ColoredMessage -Type "info" "Paso 7: Hacer checkout de la configuración."
-        Write-ColoredMessage -Type "warning" "Haciendo checkout de la configuración..."
-        try {
-            Invoke-GitConfig checkout | Out-Null # Suprimimos la salida
-            Write-ColoredMessage -Type "info" "Configuración aplicada exitosamente."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo hacer checkout de la configuración. Por favor, revisa si hay conflictos manualmente. Error: $($_.Exception.Message)"
-        }
-
-        Write-ColoredMessage -Type "info" "¡Configuración de HOME completada!"
-    }
-    "2" {
-        Write-ColoredMessage -Type "info" "Ejecutando el proceso paso a paso. Por favor, siga las instrucciones:"
-
-        # 1. Eliminar la configuración anterior (si existe).
-        Write-ColoredMessage -Type "info" "Paso 1: Eliminar configuración anterior (si existe)."
-        if (Test-Path $HOME_CFG -PathType Container) {
-            Write-ColoredMessage -Type "warning" "Se ha encontrado una configuración anterior en $HOME_CFG."
-            $respuesta = Read-Host -Prompt "¿Desea eliminarla? (s/n)"
-            Write-Host "" # Nueva línea
-            if ($respuesta.ToLower() -eq "s") {
-                Write-ColoredMessage -Type "warning" "Eliminando configuración anterior en $HOME_CFG..."
-                try {
-                    Remove-Item -Path $HOME_CFG -Recurse -Force
-                    Write-ColoredMessage -Type "info" "Configuración anterior eliminada."
-                } catch {
-                    Write-ColoredMessage -Type "error" "No se pudo eliminar la configuración anterior en $HOME_CFG. Error: $($_.Exception.Message)"
-                }
-            } else {
-                Write-ColoredMessage -Type "warning" "La configuración anterior se mantendrá."
-            }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 2..." | Out-Null
-
-        # 2. Clonar o inicializar el repositorio bare.
-        Write-ColoredMessage -Type "info" "Paso 2: Clonar o inicializar el repositorio bare."
-        if (-not (Test-Path $HOME_CFG -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Clonando el repositorio bare en $HOME_CFG..."
-            try {
-                # Directamente usar git clone, sin Invoke-GitConfig
-                & $GIT_BIN clone --bare --branch "windows" "https://github.com/Ebriopes/dotfiles.git" "$HOME_CFG"
-                Write-ColoredMessage -Type "info" "Repositorio bare clonado exitosamente en $HOME_CFG."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo clonar el repositorio bare. Error: $($_.Exception.Message)"
-            }
-        } else {
-             Write-ColoredMessage -Type "warning" "Inicializando un repositorio bare existente en $HOME_CFG..."
-             try {
-                 Write-ColoredMessage -Type "info" "El directorio $HOME_CFG ya existe. Asumiendo que es el repositorio bare."
-             } catch {
-                 Write-ColoredMessage -Type "error" "No se pudo inicializar el repositorio bare. Error: $($_.Exception.Message)"
-             }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 3..." | Out-Null
-
-        # 3. Crear un alias para el comando git (en PowerShell, es una función o alias de PowerShell)
-        Write-ColoredMessage -Type "info" "Paso 3: Configurar alias para el comando git..."
-        if (-not (Test-Path $SHELL_CONFIG_FILE)) {
-            New-Item -Path $SHELL_CONFIG_FILE -ItemType File -Force | Out-Null
-        }
-
-        # Usar el nuevo nombre de la función
-        $aliasContent = "function $($DOTFILES_GIT_FUNCTION_NAME) { & git --git-dir='$HOME_CFG/' --work-tree='$HOME' `$args }"
-        # Usar Select-String con -Raw para buscar la línea completa y evitar problemas con caracteres especiales
-        if (-not (Get-Content $SHELL_CONFIG_FILE -Raw | Select-String -Pattern "^function $($DOTFILES_GIT_FUNCTION_NAME) {" -Quiet)) {
-            try {
-                Add-Content -Path $SHELL_CONFIG_FILE -Value $aliasContent
-                Write-ColoredMessage -Type "info" "Función '$($DOTFILES_GIT_FUNCTION_NAME)' agregada a $SHELL_CONFIG_FILE. Reinicia PowerShell para que tenga efecto."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo agregar la función '$($DOTFILES_GIT_FUNCTION_NAME)' a $SHELL_CONFIG_FILE. Error: $($_.Exception.Message)"
-            }
-        } else {
-            Write-ColoredMessage -Type "warning" "La función '$($DOTFILES_GIT_FUNCTION_NAME)' ya existe en $SHELL_CONFIG_FILE. No se modificará."
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 4..." | Out-Null
-
-        # 4. Desactivar el seguimiento de archivos no rastreados.
-        Write-ColoredMessage -Type "info" "Paso 4: Desactivar el seguimiento de archivos no rastreados."
-        Write-ColoredMessage -Type "warning" "Desactivando el seguimiento de archivos no rastreados..."
-        try {
-            & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" config status.showUntrackedFiles no
-            Write-ColoredMessage -Type "info" "No tracking files."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo desactivar el seguimiento de archivos no rastreados. Error: $($_.Exception.Message)"
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 5..." | Out-Null
-
-        # 5. Crear el directorio de respaldo (si no existe).
-        Write-ColoredMessage -Type "info" "Paso 5: Crear el directorio de respaldo."
-        if (-not (Test-Path $CONFIG_BACKUP -PathType Container)) {
-            Write-ColoredMessage -Type "warning" "Creando directorio de respaldo en $CONFIG_BACKUP..."
-            try {
-                New-Item -ItemType Directory -Path $CONFIG_BACKUP -Force | Out-Null
-                Write-ColoredMessage -Type "info" "Directorio de respaldo creado exitosamente en $CONFIG_BACKUP."
-            } catch {
-                Write-ColoredMessage -Type "error" "No se pudo crear el directorio de respaldo. Error: $($_.Exception.Message)"
-            }
-        }
-        Read-Host -Prompt "Presione Enter para continuar con el Paso 6..." | Out-Null
-
-        # 6. Respaldar archivos de configuración.
-        Write-ColoredMessage -Type "info" "Paso 6: Respaldar archivos de configuración."
-        Write-ColoredMessage -Type "warning" "Respaldando archivos de configuración en $CONFIG_BACKUP..."
-
-        # --- CORRECCIÓN AQUÍ: Manejo más robusto de la salida de git checkout ---
-        $gitCheckoutOutput = ""
-        $gitExitCode = 0
-        try {
-            # Ejecutar git checkout y capturar la salida y el código de salida.
-            # El 2>&1 redirige stderr a stdout, y Out-String lo captura como una sola cadena.
-            # El bloque script { ... } permite que $ErrorActionPreference no detenga la ejecución aquí.
-            $gitCheckoutResult = & {
-                & $GIT_BIN --git-dir="$HOME_CFG/" --work-tree="$HOME" checkout 2>&1
-            }
-            $gitCheckoutOutput = $gitCheckoutResult | Out-String
-            $gitExitCode = $LASTEXITCODE # Captura el código de salida del último comando externo
-        } catch {
-            # Esto atraparía errores de PowerShell si el comando git no se encuentra, etc.
-            Write-ColoredMessage -Type "error" "Error inesperado al ejecutar 'git checkout' para obtener la lista de archivos: $($_.Exception.Message)"
-            exit 1
-        }
-
-        $backupFilesList = @()
-        $inUntrackedSection = $false
-        $isExpectedGitWarning = $false
-
-        # Verificar si la salida contiene la advertencia esperada de Git
-        if ($gitCheckoutOutput -match "error: The following untracked working tree files would be overwritten by checkout:") {
-            $isExpectedGitWarning = true
-            # Procesar la salida para extraer los nombres de los archivos
-            foreach ($line in ($gitCheckoutOutput -split "`n")) {
-                if ($line -match "error: The following untracked working tree files would be overwritten by checkout:") {
-                    $inUntrackedSection = $true
-                    continue
-                }
-                if ($inUntrackedSection -and $line -match "^\s+\./(.+)$") {
-                    $backupFilesList += $Matches[1].Trim()
-                } elseif ($inUntrackedSection -and $line.Trim() -eq "") {
-                    break
-                }
-            }
-        }
-        
-        # Si Git salió con un código de error Y NO es la advertencia esperada, entonces es un error real.
-        if ($gitExitCode -ne 0 -and -not $isExpectedGitWarning) {
-            Write-ColoredMessage -Type "error" "Error inesperado de Git al obtener la lista de archivos: $($gitCheckoutOutput)"
-        } elseif ($backupFilesList.Length -gt 0) {
-            # Si hay archivos para respaldar (ya sea por la advertencia esperada o por otros motivos)
-            Handle-BackupFiles -FilesToHandle $backupFilesList
-        } else {
-            Write-ColoredMessage -Type "info" "No hay archivos que respaldar o eliminar."
-        }
-        # --- FIN CORRECCIÓN ---
-
-        # 7. Hacer checkout de la configuración.
-        Write-ColoredMessage -Type "info" "Paso 7: Hacer checkout de la configuración."
-        Write-ColoredMessage -Type "warning" "Haciendo checkout de la configuración..."
-        try {
-            Invoke-GitConfig checkout | Out-Null # Suprimimos la salida
-            Write-ColoredMessage -Type "info" "Configuración aplicada exitosamente."
-        } catch {
-            Write-ColoredMessage -Type "error" "No se pudo hacer checkout de la configuración. Por favor, revisa si hay conflictos manualmente. Error: $($_.Exception.Message)"
-        }
-
-        Write-ColoredMessage -Type "info" "¡Configuración de HOME completada!"
-    }
-    "3" {
-        Write-ColoredMessage -Type "info" "Saliendo del script."
-        exit 0
-    }
+switch ($choice) {
+    0 { Start-DotfilesInstallation }
+    1 { Start-DotfilesInstallation -StepByStep }
+    2 { Write-Styled -Type "Info" "Operacion cancelada. No se han realizado cambios."; exit 0 }
 }
-
