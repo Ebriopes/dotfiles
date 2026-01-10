@@ -1,4 +1,5 @@
 local ok, telescope = pcall(require, 'telescope')
+local utils = require("utils")
 
 if not ok then
   return
@@ -35,6 +36,16 @@ telescope.setup{
   }
 }
 
+
+local function search_config()
+  require('telescope.builtin').find_files({
+    cwd = vim.fn.stdpath('config'), -- Esto apunta a AppData/Local/nvim en Windows
+    prompt_title = ' Configuración de NeoVim ',
+  })
+end
+
+utils.search_config = search_config
+
 local keymap = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
@@ -46,4 +57,7 @@ keymap("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", opts)
 keymap("n", "<leader>fs", "<cmd>Telescope lsp_workspace_symbols<cr>", opts)
 keymap("n", "<leader>fsw", "<cmd>Telescope lsp_workspace_symbols<cr>", opts)
 keymap("n", "<leader>fsd", "<cmd>Telescope lsp_document_symbols<cr>", opts)
+-- Ver registros (yank history) en una ventana flotante con Telescope
+keymap('n', '<leader>fr', '<cmd>Telescope registers<cr>', vim.tbl_extend( "force", opts, { desc = '[User]{Telescope} Ver Registros (Yank History)' }))
+keymap('n', '<leader>fc', search_config, vim.tbl_extend('force', opts, { desc = '[User]{Telescope} Buscar en Configuración de Neovim' }))
 

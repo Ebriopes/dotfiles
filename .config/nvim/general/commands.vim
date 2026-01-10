@@ -64,9 +64,7 @@ endif
 
 filetype plugin on
 
+"If you need changes the colorscheme, I recomend you go to
+"./general/themes.vim
 " Default theme is evening. 
 colorscheme evening
-
-"If you need changes the colorscheme, I recomend you go to
-"./plugin/themes-config.vim
-silent! colorscheme everforest

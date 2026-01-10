@@ -101,7 +101,7 @@ call plug#begin()
       Plug 'saadparwaiz1/cmp_luasnip'
 
       " Highlighting support
-      Plug 'nvim-treesitter/nvim-treesitter' ", {'do': ':TSUpdate'}
+      Plug 'nvim-treesitter/nvim-treesitter', { 'branch': 'master' } ", {'do': ':TSUpdate'}
 
     endif
 
@@ -119,6 +119,10 @@ call plug#begin()
     if has('nvim-0.10.4')
       " Search engine
       Plug 'nvim-telescope/telescope.nvim', { 'tag': 'v0.2.0' }
+    endif
+
+    if has('nvim-0.11.0')
+      Plug 'nvim-treesitter/nvim-treesitter', { 'branch': 'main' } ", {'do': ':TSUpdate'}
     endif
 
   else
