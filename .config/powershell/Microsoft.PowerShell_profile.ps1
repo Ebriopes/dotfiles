@@ -49,3 +49,6 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
     #Write-Host "Cargando entorno legado (v5.1)..." -ForegroundColor Gray
 #}
 
+
+# Alias para gestionar dotfiles
+function dotfiles { & git --git-dir='C:\Users\danys\.cfg' --work-tree='C:\Users\danys' $args }
