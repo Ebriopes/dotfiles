@@ -76,10 +76,10 @@ printf "[1;34mDownloading to %s...\n[0m" "${PWD}"
 
 (
     # cd "$temp_dir" || { printf "[1;31mError: Failed to change to temporary directory.\n[0m"; exit 1; }
-    wget -O original-installer.sh https://raw.githubusercontent.com/Ebriopes/dotfiles/server/original-installer.sh || { printf "[1;31mError: Failed to download original-installer.sh.\n[0m"; exit 1; }
-    chmod +x original-installer.sh
-    printf "[1;34mExecuting original-installer.sh...\n[0m"
-    ./original-installer.sh
+    wget -O environment-config.sh https://raw.githubusercontent.com/Ebriopes/dotfiles/server/environment-config.sh || { printf "[1;31mError: Failed to download environment-config.sh.\n[0m"; exit 1; }
+    chmod +x environment-config.sh
+    printf "[1;34mExecuting environment-config.sh...\n[0m"
+    ./environment-config.sh
 )
 
 # printf "[1;34mCleaning up...\n[0m"
