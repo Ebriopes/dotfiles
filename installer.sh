@@ -152,6 +152,71 @@ install_desktop_tools() {
     install_packages "${packages[@]}"
 }
 
+install_zsh_plugins() {
+    write_styled "Section" "Instalando Zsh y sus plugins"
+    
+    # Instalar Zsh
+    install_packages "zsh"
+
+    # Instalar Oh My Zsh
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        write_styled "Warning" "Oh My Zsh ya está instalado. Omitiendo la instalación."
+    else
+        write_styled "Info" "Instalando Oh My Zsh..."
+        if command -v curl &>/dev/null; then
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        elif command -v wget &>/dev/null; then
+            sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        else
+            write_styled "Warning" "Ni curl ni wget están disponibles para instalar Oh My Zsh."
+            return
+        fi
+    fi
+
+    local ZSH_CUSTOM_PLUGINS="$HOME/.oh-my-zsh/custom/plugins"
+    local ZSH_CUSTOM_THEMES="$HOME/.oh-my-zsh/custom/themes"
+
+    # Instalar zsh-autosuggestions
+    if [ -d "${ZSH_CUSTOM_PLUGINS}/zsh-autosuggestions" ]; then
+        write_styled "Warning" "zsh-autosuggestions ya está instalado."
+    else
+        write_styled "Info" "Instalando zsh-autosuggestions..."
+        git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM_PLUGINS}/zsh-autosuggestions"
+    fi
+
+    # Instalar zsh-syntax-highlighting
+    if [ -d "${ZSH_CUSTOM_PLUGINS}/zsh-syntax-highlighting" ]; then
+        write_styled "Warning" "zsh-syntax-highlighting ya está instalado."
+    else
+        write_styled "Info" "Instalando zsh-syntax-highlighting..."
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM_PLUGINS}/zsh-syntax-highlighting"
+    fi
+
+    # Instalar Powerlevel10k
+    if [ -d "${ZSH_CUSTOM_THEMES}/powerlevel10k" ]; then
+        write_styled "Warning" "Powerlevel10k ya está instalado."
+    else
+        write_styled "Info" "Instalando Powerlevel10k..."
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM_THEMES}/powerlevel10k"
+    fi
+    
+    write_styled "Success" "Instalación de Zsh y plugins completada."
+    write_styled "Info" "Por favor, configura tu archivo .zshrc para activar los plugins y el tema."
+    write_styled "Info" "Ejemplo de configuración en .zshrc:"
+    echo '
+# Ejemplo de configuración para .zshrc:
+# Theme
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Plugins
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+'
+}
+
 run_environment_config() {
     write_styled "Section" "Ejecutando script de configuración de entorno"
     local script_url="https://raw.githubusercontent.com/Ebriopes/dotfiles/server/dotfiles-setup.sh"
@@ -184,9 +249,10 @@ show_menu() {
     echo "  1) Instalar dependencias base (git, curl, stow, etc.)"
     echo "  2) Instalar herramientas de desarrollo (compiladores, nvm, etc.)"
     echo "  3) Instalar herramientas de escritorio (rofi, alacritty, i3, etc.)"
-    echo "  4) Instalar TODO"
-    echo "  5) Ejecutar script de configuración de entorno"
-    echo "  6) Salir"
+    echo "  4) Instalar plugins de Zsh (oh-my-zsh, p10k, etc.)"
+    echo "  5) Instalar TODO"
+    echo "  6) Ejecutar script de configuración de entorno"
+    echo "  7) Salir"
     echo ""
 }
 
@@ -195,7 +261,7 @@ main() {
     
     while true; do
         show_menu
-        read -rp "Elige una opción [1-6]: " choice
+        read -rp "Elige una opción [1-7]: " choice
         case "$choice" in
             1)
                 install_base_deps
@@ -207,20 +273,24 @@ main() {
                 install_desktop_tools
                 ;;
             4)
+                install_zsh_plugins
+                ;;
+            5)
                 write_styled "Section" "Instalando todo..."
                 install_base_deps
                 install_dev_tools
                 install_desktop_tools
-                ;;
-            5)
-                run_environment_config
+                install_zsh_plugins
                 ;;
             6)
+                run_environment_config
+                ;;
+            7)
                 write_styled "Info" "Operación finalizada."
                 break
                 ;;
             *)
-                write_styled "Warning" "Opción no válida. Por favor, elige entre 1 y 6."
+                write_styled "Warning" "Opción no válida. Por favor, elige entre 1 y 7."
                 ;;
         esac
         read -rp "Presiona Enter para continuar..."
