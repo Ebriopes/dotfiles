@@ -219,3 +219,5 @@ fi
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+
+alias dotfiles='git --git-dir=/home/daniel/.cfg --work-tree=/home/daniel'
