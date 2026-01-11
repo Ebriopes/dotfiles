@@ -37,7 +37,7 @@ Have installed:
 ####  Paste & use
 
 ```sh
-wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.sh | bash
+bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.sh)
 ```
 
 ### Windows
