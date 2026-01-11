@@ -219,7 +219,7 @@ plugins=(
 
 run_environment_config() {
     write_styled "Section" "Ejecutando script de configuración de entorno"
-    local script_url="https://raw.githubusercontent.com/Ebriopes/dotfiles/server/scripts/dotfiles-setup.sh"
+    local script_url="https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/dotfiles-setup.sh"
     local script_path="/tmp/dotfiles-setup.sh"
 
     write_styled "Info" "Descargando script desde $script_url..."

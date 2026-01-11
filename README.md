@@ -37,7 +37,7 @@ Have installed:
 ####  Paste & use
 
 ```sh
-bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.sh)
+bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/installer.sh)
 ```
 
 ### Windows
@@ -71,7 +71,7 @@ Verify `ExecutionPolicy` to don't be ***restricted***
 #### Paste & use
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.ps1 -OutFile $HOME\Downloads\dotfiles-installer.ps1
+Invoke-WebRequest https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/installer.ps1 -OutFile $HOME\Downloads\dotfiles-installer.ps1
 powershell -ExecutionPolicy Bypass -File $HOME\Downloads\dotfiles-installer.ps1
 ```
 
