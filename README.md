@@ -15,9 +15,26 @@ Current config backups
 
 ## Installing
 
-Here you will find the scripts to install my environment config:
+Here you will find the scripts to install my environment config
+
+### Pre-requirements
+
+Have installed:
+
+- Git 
+  
+  > You could try `winget install --id Git.Git`
 
 ### Linux
+
+#### Recommend
+
+- Pyenv 
+  
+  > You could try ``curl -fsSL https://pyenv.run | bash``
+
+
+####  Paste & use
 
 ```sh
 wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.sh | bash
@@ -25,7 +42,7 @@ wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/installer.
 
 ### Windows
 
-#### Pre-requirements
+#### Requirements
 
 Verify `ExecutionPolicy` to don't be ***restricted*** 
 
@@ -39,13 +56,8 @@ Verify `ExecutionPolicy` to don't be ***restricted***
 > To change th "Restricted" status you can use 
 > `Set-ExecutionPolicy RemoteSigned -Force` 
 
-Have installed:
 
-- Git 
-  
-  > You could try `winget install --id Git.Git`
-
-##### Recommended
+#### Recommended
 
 - **NPM**
 
@@ -55,6 +67,7 @@ Have installed:
   
   > You could try ``winget install --id Starship.Starship``
 
+
 #### Paste & use
 
 ```powershell
@@ -62,7 +75,7 @@ Invoke-WebRequest https://raw.githubusercontent.com/Ebriopes/dotfiles/server/ins
 powershell -ExecutionPolicy Bypass -File $HOME\Downloads\dotfiles-installer.ps1
 ```
 
-### Environment script
+## Environment script
 
 You can see the original environment configuration script here: [environment.sh](./environment-config.sh)
 

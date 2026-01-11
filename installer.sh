@@ -1,86 +1,231 @@
 #!/usr/bin/env bash
 
-clear
+# =============================================================================
+# Script de Instalación de Dotfiles para Linux y macOS
+#
+# Mejora del script original para permitir una instalación modular y selectiva
+# de dependencias, basado en el gestor de paquetes del sistema operativo.
+# =============================================================================
 
-os=$(uname -s)
-distro=$(
-    if [ -r /etc/os-release ]; then
-        . /etc/os-release
-        echo "$ID"
-        elif [ -r /etc/lsb-release ]; then
-        lsb_release -i | cut -d'=' -f2
+# --- Configuración del Script ---
+# Detiene la ejecución del script inmediatamente si un comando falla.
+set -eo pipefail
+
+# --- Variables Globales y Detección del Entorno ---
+OS=""
+DISTRO=""
+PACKAGE_MANAGER=""
+NEEDS_SUDO="sudo"
+
+# Función para dar formato a la salida en la terminal.
+write_styled() {
+    local type="$1"
+    local message="$2"
+    local color_info='\033[0;36m'    # Cyan
+    local color_warning='\033[0;33m' # Yellow
+    local color_error='\033[0;31m'   # Red
+    local color_success='\033[0;32m' # Green
+    local color_section='\033[0;35m' # Magenta
+    local color_reset='\033[0m'
+
+    case "$type" in
+        "Info")
+            printf "${color_info}[Info] %s${color_reset}\n" "$message"
+            ;;
+        "Warning")
+            printf "${color_warning}[Warning] %s${color_reset}\n" "$message"
+            ;;
+        "Error")
+            printf "${color_error}[Error] %s${color_reset}\n" "$message"
+            exit 1
+            ;;
+        "Success")
+            printf "${color_success}[Success] %s${color_reset}\n" "$message"
+            ;;
+        "Section")
+            printf "\n${color_section}--- %s ---${color_reset}\n" "$message"
+            ;;
+    esac
+}
+
+detect_os() {
+    write_styled "Info" "Detectando sistema operativo y gestor de paquetes..."
+    OS=$(uname -s)
+
+    if [[ "$OS" == "Linux" ]]; then
+        if [ -r /etc/os-release ]; then
+            # shellcheck source=/dev/null
+            . /etc/os-release
+            DISTRO=$ID
+        else
+            DISTRO="unknown"
+        fi
+
+        case "$DISTRO" in
+            ubuntu|debian|pop) PACKAGE_MANAGER="apt-get" ;; 
+            manjaro|arch) PACKAGE_MANAGER="pacman" ;; 
+            alpine) PACKAGE_MANAGER="apk" ;; 
+            fedora) PACKAGE_MANAGER="dnf" ;; 
+            *) write_styled "Error" "Distribución de Linux no soportada: $DISTRO" 
+        esac
+
+    elif [[ "$OS" == "Darwin" ]]; then # macOS
+        DISTRO="macOS"
+        if command -v brew &>/dev/null; then
+            PACKAGE_MANAGER="brew"
+            NEEDS_SUDO="" # Homebrew no necesita sudo
+        else
+            write_styled "Error" "Homebrew no está instalado. Por favor, instálalo para continuar."
+        fi
     else
-        echo "Unknown"
+        write_styled "Error" "Sistema operativo no soportado: $OS"
     fi
-)
+    write_styled "Success" "Sistema detectado: $OS ($DISTRO) con $PACKAGE_MANAGER."
+}
 
-if [[ "$os" != "Linux" ]]; then
-    printf "[1;31mError: This script only supports Linux-based operating systems.\n[0m"
-    exit 1
-fi
-
-printf "[1;34mOperative System: %s\nDistribution: %s\n\n[0m" "$os" "$distro"
-printf "[1;32mHi, I'm your dotfiles installer!\nI will try to install all the necessary packages and dependencies to make your home feel like one.\n\n[0m"
+# --- Funciones de Instalación ---
 
 install_packages() {
-    local package_manager="$1" packages="$2" missing_packages=""
-    printf "[1;33mChecking for required packages (%s)...\n[0m" "$package_manager"
-    
-    for package in $packages; do
-        printf "  Checking %s...\n" "$package"
-        if ! type "$package" &>/dev/null; then
-            missing_packages+="$package "
-        fi
-    done
-    
-    if [ -n "$missing_packages" ]; then
-        printf "[1;33mThe following packages will be installed using %s: \n%s\n\n[0m" "$package_manager" "$missing_packages"
-        case "$package_manager" in
-            "apt-get") sudo apt-get -y install $missing_packages ;;
-            "pacman") sudo pacman -Sy --noconfirm $missing_packages ;;
-            "apk") sudo apk add --no-cache $missing_packages ;;
-            *) printf "[1;31mError: Unsupported package manager: %s\n[0m" "$package_manager"; return 1 ;;
-        esac
-        printf "[1;32mPackages installed successfully!\n[0m"
-    else
-        printf "[1;32mAll required packages for %s are already installed.\n[0m" "$package_manager"
+    local packages_to_install=("$@")
+    if [ ${#packages_to_install[@]} -eq 0 ]; then
+        write_styled "Warning" "No se especificaron paquetes para instalar."
+        return
     fi
+    
+    write_styled "Info" "Instalando los siguientes paquetes: ${packages_to_install[*]}"
+
+    case "$PACKAGE_MANAGER" in
+        "apt-get")
+            $NEEDS_SUDO apt-get update
+            $NEEDS_SUDO apt-get install -y "${packages_to_install[@]}"
+            ;;
+        "pacman")
+            $NEEDS_SUDO pacman -Sy --noconfirm "${packages_to_install[@]}"
+            ;;
+        "apk")
+            $NEEDS_SUDO apk add --no-cache "${packages_to_install[@]}"
+            ;;
+        "dnf")
+            $NEEDS_SUDO dnf install -y "${packages_to_install[@]}"
+            ;;
+        "brew")
+            $NEEDS_SUDO brew install "${packages_to_install[@]}"
+            ;;
+        *)
+            write_styled "Error" "Gestor de paquetes no soportado: $PACKAGE_MANAGER"
+            ;;
+    esac
+    write_styled "Success" "Paquetes instalados correctamente."
 }
 
-case "$distro" in
-    ubuntu|debian) install_packages "apt-get" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
-    manjaro|arch) install_packages "pacman" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
-    alpine) install_packages "apk" "git curl gcc g++ clang make rofi rxvt-unicode" ;;
-esac
+install_base_deps() {
+    write_styled "Section" "Instalando Dependencias Base"
+    local packages=("git" "curl" "wget" "stow")
+    install_packages "${packages[@]}"
+}
 
-install_nvm() {
-    printf "[1;33mInstalling NVM...\n[0m"
+install_dev_tools() {
+    write_styled "Section" "Instalando Herramientas de Desarrollo"
+    local packages=("gcc" "g++" "clang" "make")
+    install_packages "${packages[@]}"
+
+    write_styled "Info" "Instalando NVM (Node Version Manager)..."
     if command -v curl &>/dev/null; then
-        installer="curl -o-"
-        elif command -v wget &>/dev/null; then
-        installer="wget -qO-"
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    elif command -v wget &>/dev/null; then
+        wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
     else
-        printf "[1;31mError: Neither curl nor wget are available. Please install one of them to proceed with NVM installation.\n[0m"
-        return 1
+        write_styled "Warning" "Ni curl ni wget están disponibles para instalar NVM."
     fi
-    printf "[1;34mUsing %s to install NVM...\n[0m" "${installer%" -o-"}"
-    $installer https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
-    printf "[1;32mNVM installed successfully!\n[0m"
 }
 
-install_nvm
+install_desktop_tools() {
+    write_styled "Section" "Instalando Herramientas de Entorno de Escritorio"
+    local packages=("zoxide" "eza")
+    if [[ "$OS" == "Linux" ]]; then
+        packages+=("rofi" "rxvt-unicode" "i3" "alacritty" "feh")
+    elif [[ "$OS" == "Darwin" ]]; then
+        # Equivalentes o alternativas para macOS
+        packages+=("alacritty") 
+        write_styled "Info" "Algunas herramientas como rofi, i3, feh son específicas de Linux y no se instalarán en macOS."
+    fi
+    install_packages "${packages[@]}"
+}
 
-printf "[1;34mDownloading original installer script...\n[0m"
-# temp_dir=$(mktemp -d) || { printf "[1;31mError: Failed to create temporary directory.\n[0m"; exit 1; }
-printf "[1;34mDownloading to %s...\n[0m" "${PWD}"
+run_environment_config() {
+    write_styled "Section" "Ejecutando script de configuración de entorno"
+    local script_url="https://raw.githubusercontent.com/Ebriopes/dotfiles/server/dotfiles-setup.sh"
+    local script_path="/tmp/dotfiles-setup.sh"
 
-(
-    # cd "$temp_dir" || { printf "[1;31mError: Failed to change to temporary directory.\n[0m"; exit 1; }
-    wget -O environment-config.sh https://raw.githubusercontent.com/Ebriopes/dotfiles/server/environment-config.sh || { printf "[1;31mError: Failed to download environment-config.sh.\n[0m"; exit 1; }
-    chmod +x environment-config.sh
-    printf "[1;34mExecuting environment-config.sh...\n[0m"
-    ./environment-config.sh
-)
+    write_styled "Info" "Descargando script desde $script_url..."
+    if command -v curl &>/dev/null; then
+        curl -L -o "$script_path" "$script_url"
+    elif command -v wget &>/dev/null; then
+        wget -O "$script_path" "$script_url"
+    else
+        write_styled "Error" "Se necesita curl o wget para descargar el script."
+    fi
 
-# printf "[1;34mCleaning up...\n[0m"
-# rm -rf "$temp_dir"
+    chmod +x "$script_path"
+    write_styled "Info" "Ejecutando $script_path..."
+    bash "$script_path"
+    write_styled "Success" "Script de entorno ejecutado."
+}
+
+# --- Menú Principal ---
+
+show_menu() {
+    clear
+    write_styled "Section" "Instalador de Dotfiles"
+    echo "Sistema Operativo: $OS ($DISTRO)"
+    echo "Gestor de Paquetes: $PACKAGE_MANAGER"
+    echo ""
+    echo "Selecciona una opción:"
+    echo "  1) Instalar dependencias base (git, curl, stow, etc.)"
+    echo "  2) Instalar herramientas de desarrollo (compiladores, nvm, etc.)"
+    echo "  3) Instalar herramientas de escritorio (rofi, alacritty, i3, etc.)"
+    echo "  4) Instalar TODO"
+    echo "  5) Ejecutar script de configuración de entorno"
+    echo "  6) Salir"
+    echo ""
+}
+
+main() {
+    detect_os
+    
+    while true; do
+        show_menu
+        read -rp "Elige una opción [1-6]: " choice
+        case "$choice" in
+            1)
+                install_base_deps
+                ;;
+            2)
+                install_dev_tools
+                ;;
+            3)
+                install_desktop_tools
+                ;;
+            4)
+                write_styled "Section" "Instalando todo..."
+                install_base_deps
+                install_dev_tools
+                install_desktop_tools
+                ;;
+            5)
+                run_environment_config
+                ;;
+            6)
+                write_styled "Info" "Operación finalizada."
+                break
+                ;;
+            *)
+                write_styled "Warning" "Opción no válida. Por favor, elige entre 1 y 6."
+                ;;
+        esac
+        read -rp "Presiona Enter para continuar..."
+    done
+}
+
+# --- Punto de Entrada ---
+main
