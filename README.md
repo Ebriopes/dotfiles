@@ -77,8 +77,9 @@ powershell -ExecutionPolicy Bypass -File $HOME\Downloads\dotfiles-installer.ps1
 
 ## Environment script
 
-You can see the original environment configuration script here: [environment.sh](./environment-config.sh)
+You can see the original environment configuration script here: [base_install.sh](./assets/scripts/base_install.sh)
 
 ---
 
 We are continue developing this page...
+
