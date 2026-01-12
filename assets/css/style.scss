@@ -1,0 +1,82 @@
+--- 
+--- 
+
+@import "{{ site.theme }}";
+
+// h1, h2, h3, h4, h5, h6 {
+//   text-transform: uppercase;
+// }
+
+.btn-github .icon {
+  filter: invert(1);
+}
+
+.container {
+  &:last-of-type:has(#main_content) {
+    margin-block-end: 5rem ;
+  }
+}
+
+#main_content {
+  >p,
+  >ul,
+  >div {
+    margin-inline-start: 2rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    border-top: double .5rem teal;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    margin-inline-start: 1rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    margin-inline-start: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+    // margin-inline-start: 1.5rem;
+  }
+
+  strong {
+    color: teal;
+    // text-decoration: underline;
+  }
+
+  hr {
+    + :is(h2){
+      border-top: unset;
+    }
+  }
+
+  * + {
+    h1 {
+      margin-block-start: 5rem;
+    }
+
+    h2 {
+      margin-block-start: 3rem;
+    }
+
+    h3, h4 {
+      margin-block-start: 2rem;
+    }
+
+    h5 {
+      margin-block-start: 1rem;
+    }
+  }
+}
+
