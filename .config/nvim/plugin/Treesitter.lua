@@ -56,6 +56,7 @@ treesitter_conf.setup {
   },
 }
 
+-- Fold settings --
 vim.opt.foldmethod = 'expr'
 
 -- For Neovim v0.10.0+ it's recommended to use the core function
@@ -71,5 +72,5 @@ end
 vim.opt.foldlevelstart = 5 -- Puedes mantener esto
 vim.opt.foldcolumn = '1'     -- Puedes mantener esto
 
-let g:javaScript_fold = 1
+--let g:javaScript_fold = 1
 
