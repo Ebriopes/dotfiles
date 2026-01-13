@@ -37,6 +37,31 @@
   }
 }
 
+pre {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  font-size: 16px;
+  color: #b5e853CC;
+  border-radius: 5px;
+  word-wrap: normal;
+  overflow: auto;
+  overflow-y: hidden;
+  
+  > code {
+    color: #b5e853CC;
+  }
+}
+
+code.highlighter-rouge {
+  background: rgba(0,0,0,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 3px;
+  margin: 0px -3px;
+  color: #aa759f;
+  border-radius: 2px;
+}
+
 #main_content {
   >p,
   >ul,
@@ -100,3 +125,28 @@
   }
 }
 
+/*****************
+ * CUSTOM STYLES *
+ *****************/
+
+// div.highlighter-rouge {
+  .highlight {
+    border-radius: 5px;
+
+    > pre{
+      margin: 0;
+      padding: 1rem;
+      transition: all 500ms ease-in-out;
+
+      &:has(+ .code-header > button:hover){
+        background-color: #666;
+      }
+    }
+
+    > .code-header{
+      padding-block: 8px 3px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+// }
