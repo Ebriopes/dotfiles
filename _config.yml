@@ -30,7 +30,8 @@ github_username:  ebriopes
 
 # Build settings
 theme: jekyll-theme-hacker
-# plugins:
+plugins:
+  - jekyll-gfm-admonitions
 #   - jekyll-feed
 
 # Exclude from processing.

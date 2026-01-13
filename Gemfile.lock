@@ -26,6 +26,7 @@ GEM
     commonmarker (0.23.12)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
+    cssminify (1.0.2)
     csv (3.3.5)
     dnsruby (1.73.1)
       base64 (>= 0.2)
@@ -137,6 +138,10 @@ GEM
       jekyll (>= 3.0, < 5.0)
     jekyll-feed (0.17.0)
       jekyll (>= 3.7, < 5.0)
+    jekyll-gfm-admonitions (1.2.0)
+      cssminify (~> 1.0)
+      jekyll (>= 3.0, < 5.0)
+      octicons (~> 19.8)
     jekyll-gist (1.5.0)
       octokit (~> 4.2)
     jekyll-github-metadata (2.16.1)
@@ -237,6 +242,7 @@ GEM
       uri (>= 0.11.1)
     nokogiri (1.19.0-x64-mingw-ucrt)
       racc (~> 1.4)
+    octicons (19.21.1)
     octokit (4.25.1)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
@@ -282,8 +288,7 @@ DEPENDENCIES
   github-pages
   http_parser.rb (~> 0.6.0)
   jekyll-feed (~> 0.12)
-  jekyll-theme-minimal
-  minima (~> 2.5)
+  jekyll-gfm-admonitions
   tzinfo (>= 1, < 3)
   tzinfo-data
   wdm (~> 0.1)
@@ -299,6 +304,7 @@ CHECKSUMS
   commonmarker (0.23.12) sha256=da2d2f89c7c7b51c42c6e69ace3ab5df39497683f86e83aca7087c671d523ccd
   concurrent-ruby (1.3.6) sha256=6b56837e1e7e5292f9864f34b69c5a2cbc75c0cf5338f1ce9903d10fa762d5ab
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
+  cssminify (1.0.2) sha256=f574503558cd442c6286831ffdbebdb4587f6deb827ef7575f73f377a376a898
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   dnsruby (1.73.1) sha256=6cf327f5fe2768deadb5e3f3e899ff1ae110aefcef43fef32e1e55e71289e992
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
@@ -323,6 +329,7 @@ CHECKSUMS
   jekyll-commonmark-ghpages (0.5.1) sha256=d56722f23393e45625e6e1bac6d3c64bb5f5cdf6ca547338160536d61c27a4a4
   jekyll-default-layout (0.1.5) sha256=c626be4e4a5deafca123539da2cd22ff873be350cafd4da134039efdf24320af
   jekyll-feed (0.17.0) sha256=689aab16c877949bb9e7a5c436de6278318a51ecb974792232fd94d8b3acfcc3
+  jekyll-gfm-admonitions (1.2.0) sha256=38b95c75449033465313a92c2da3ee311d3569f38e6053c635bc16d3c28e702d
   jekyll-gist (1.5.0) sha256=495b6483552a3e2975a2752964ea7acddd545bc6e13ce2be15a50cec8d4c9f0f
   jekyll-github-metadata (2.16.1) sha256=4cf29988bdaf24774a7bc07fae71e54424ddfaa2895f742d8fa3036d0db65b4c
   jekyll-include-cache (0.2.1) sha256=c7d4b9e551732a27442cb2ce853ba36a2f69c66603694b8c1184c99ab1a1a205
@@ -364,6 +371,7 @@ CHECKSUMS
   minitest (6.0.1) sha256=7854c74f48e2e975969062833adc4013f249a4b212f5e7b9d5c040bf838d54bb
   net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   nokogiri (1.19.0-x64-mingw-ucrt) sha256=05d7ed2d95731edc9bef2811522dc396df3e476ef0d9c76793a9fca81cab056b
+  octicons (19.21.1) sha256=52f7330d7896fd18521999d1f6e9191f8b85ab22268b77e9f6d983a988556485
   octokit (4.25.1) sha256=c02092ee82dcdfe84db0e0ea630a70d32becc54245a4f0bacfd21c010df09b96
   pathutil (0.16.2) sha256=e43b74365631cab4f6d5e4228f812927efc9cb2c71e62976edcb252ee948d589
   prism (1.7.0) sha256=10062f734bf7985c8424c44fac382ac04a58124ea3d220ec3ba9fe4f2da65103

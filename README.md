@@ -46,14 +46,15 @@ bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/ass
 
 Verify `ExecutionPolicy` to don't be ***restricted*** 
 
-> [!TIP] How to disable _ExecutionPolicy_
-> To change the *ExecutionPolicy* you need open an *Administrator Terminal* 
+> [!TIP] How to disable _ExecutionPolicy_  
+>  
+> To change the *ExecutionPolicy* you need  
+> - Open an *Administrator Terminal*  
 > 
-> Where you will to validate your current status
+> - Where you will to validate your current status
+> `Get-ExecutionPolicy`  
 > 
-> `Get-ExecutionPolicy`
-> 
-> To change th "Restricted" status you can use 
+> - To change the "Restricted" status you can use 
 > `Set-ExecutionPolicy RemoteSigned -Force` 
 
 
