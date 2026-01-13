@@ -83,7 +83,10 @@ powershell -ExecutionPolicy Bypass -File $HOME\Downloads\dotfiles-installer.ps1
 
 You can see the original environment configuration script here: [base_install.sh](./assets/scripts/base_install.sh)
 
+Where initialy configure a basic bare repository
+
 ---
 
 We are continue developing this page...
+
 
