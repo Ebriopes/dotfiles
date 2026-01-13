@@ -25,6 +25,13 @@ Have installed:
   
   > You could try `winget install --id Git.Git`
 
+#### Recommend
+
+- **NPM**
+
+- Setup **SSH *Server***
+
+
 ### Linux
 
 #### Recommend
@@ -59,10 +66,6 @@ Verify `ExecutionPolicy` to don't be ***restricted***
 
 
 #### Recommended
-
-- **NPM**
-
-- Setup **SSH *Server***
 
 - **Starship** 
   
