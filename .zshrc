@@ -95,7 +95,7 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='nvim'
+export EDITOR='nvim'
 # fi
 
 # Compilation flags
@@ -128,7 +128,7 @@ source $ZSH/oh-my-zsh.sh
 export NODE_OPTIONS="--max-old-space-size=16384"
 
 export PATH="$PATH:/usr/local/bin"
-export PATH="$PATH:$HOME/.local/bin" #Add it in .zprofile
+#export PATH="$PATH:/Users/daniel/.local/bin" #Add it in .zprofile
 
 ##########         Functions         ##########
 # Función de autocompletado
@@ -151,14 +151,17 @@ function cd_tree() {
 alias work="cd ~/Documents/Repos"
 alias projects="cd ~/Documents/Repos/Proyectos"
 alias features="cd ~/Documents/Repos/Features"
+alias glomove="cd ~/Documents/Repos/Proyectos/Glomo-VE"
+
 # Redirects
 alias python='python3'
+
 # Commands
-alias ls='ls -l --colo=always -h'
 alias cd=cd_tree
 alias tree='tree --dirsfirst --du -hlC -L1'
-alias lt='tree -aFL1'
+alias lt='tree -aFL 1'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
+alias eza='eza --group-directories-first --icons=always -lTL 1'
 
 ########## Tool Config ########## 
 # pyenv
@@ -176,9 +179,37 @@ export NVM_DIR="$HOME/.nvm"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# place this after nvm initialization!
 #autoload -U compinit && compinit
+autoload -U add-zsh-hook
+
+load-nvmrc() {
+  local nvmrc_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version
+    nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+      nvm use
+    fi
+  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
 eval "$(register-python-argcomplete pipx)"
-eval "$(zoxide init zsh)"
+
+if type zoxide &> /dev/null;then
+  eval "$(zoxide init zsh)"
+fi
 
 
 ########## MAC Config ##########
@@ -219,5 +250,3 @@ fi
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-
-alias dotfiles='git --git-dir=/home/daniel/.cfg --work-tree=/home/daniel'
