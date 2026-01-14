@@ -1,0 +1,58 @@
+name: Sync Unix-like configurations
+
+on:
+  push:
+    branches:
+      - main
+      - mac-environment
+      - linux
+    paths:
+      - '.zshrc'
+# Definimos aquí las ramas que queremos mantener en el grupo de sincronización
+env:
+  SYNC_GROUP: "main linux mac-environment"
+
+jobs:
+  sync-zsh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Sync ZSHRC to other branches
+        run: |
+          SOURCE_BRANCH="${{ github.ref_name }}"
+          echo "Rama origen: $SOURCE_BRANCH"
+
+          # Usamos la variable de entorno directamente con la sintaxis de Bash $SYNC_GROUP
+          for branch in $SYNC_GROUP; do
+            
+            if [ "$branch" == "$SOURCE_BRANCH" ]; then
+              echo "Saltando $branch (es la rama origen)."
+              continue
+            fi
+
+            echo "--- Sincronizando ZSH con: $branch ---"
+            
+            if git checkout "$branch"; then
+                git checkout "$SOURCE_BRANCH" -- .zshrc
+                
+                if ! git diff --cached --exit-code; then
+                  git commit -m "🔧 Chore: sync .zshrc from '$SOURCE_BRANCH'"
+                  git push origin "$branch"
+                else
+                  echo "No hay cambios detectados en $branch."
+                fi
+            else
+                echo "Error: La rama $branch no existe o no se pudo acceder."
+            fi
+          done
