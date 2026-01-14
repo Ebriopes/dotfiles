@@ -95,7 +95,7 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='nvim'
+export EDITOR='nvim'
 # fi
 
 # Compilation flags
@@ -155,11 +155,13 @@ alias glomove="cd ~/Documents/Repos/Proyectos/Glomo-VE"
 
 # Redirects
 alias python='python3'
+
 # Commands
 alias cd=cd_tree
 alias tree='tree --dirsfirst --du -hlC -L1'
 alias lt='tree -aFL 1'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
+alias eza='eza --group-directories-first --icons=always -lTL 1'
 
 ########## Tool Config ########## 
 # pyenv
@@ -204,6 +206,10 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
 eval "$(register-python-argcomplete pipx)"
+
+if type zoxide &> /dev/null;then
+  eval "$(zoxide init zsh)"
+fi
 
 
 ########## MAC Config ##########
