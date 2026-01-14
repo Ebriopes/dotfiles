@@ -161,6 +161,7 @@ alias cd=cd_tree
 alias tree='tree --dirsfirst --du -hlC -L1'
 alias lt='tree -aFL 1'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
+alias dotfiles='git --git-dir=$HOME/.cfg --work-tree=$HOME'
 alias eza='eza --group-directories-first --icons=always -lTL 1'
 
 ########## Tool Config ########## 
