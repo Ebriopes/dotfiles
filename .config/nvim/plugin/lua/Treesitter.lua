@@ -16,6 +16,7 @@ if vim.fn.has("nvim-0.10.0") == 1 then
 	vim.opt.foldexpr = "vim.treesitter.foldexpr()"
 
 	if vim.fn.has("nvim-0.11.0") == 1 then
+		vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 		vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 		vim.wo.foldmethod = "expr"
 	end

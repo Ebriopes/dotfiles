@@ -150,7 +150,7 @@ call plug#begin()
       Plug 'williamboman/mason.nvim'
 
       " Search engine
-      Plug 'nvim-telescope/telescope.nvim', { 'tag': 'v0.2.0' }
+      Plug 'nvim-telescope/telescope.nvim', { 'tag': 'v0.2.1' }
       
       " Notifications
       Plug 'rcarriga/nvim-notify'
