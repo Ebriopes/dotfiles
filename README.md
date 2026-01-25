@@ -43,13 +43,18 @@ Have installed:
 
 ####  Paste & use
 
-```sh Wget
+##### WGet
+
+```sh
 bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/installer.sh)
 ```
 
-```sh Curl
+##### Curl
+
+```sh
 bash <(curl -L https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/installer.sh)
 ```
+
 
 ### Windows
 
