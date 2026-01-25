@@ -8,6 +8,7 @@ on:
       - mac-environment
       - windows
       - android-termux
+      - server
     paths:
       - ".zshrc"
       - ".config/nvim/**"
