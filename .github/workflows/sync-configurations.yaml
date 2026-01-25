@@ -1,0 +1,55 @@
+name: Sync Environment Cross Configurations
+
+on:
+  push:
+    branches:
+      - main
+      - linux
+      - mac-environment
+      - windows
+      - android-termux
+    paths:
+      - ".zshrc"
+      - ".config/nvim/**"
+      - ".github/workflows/**"
+      - "README.md"
+
+# Definimos aquí las ramas que queremos mantener en el grupo de sincronización
+env:
+  SYNC_GROUP_UNIX: "main linux mac-environment android-termux"
+  SYNC_GROUP_DOS: "main windows"
+  SYNC_GROUP_BOTH: "main linux mac-environment android-termux windows"
+
+jobs:
+  sync:
+    strategy:
+      # 'fail-fast: false' asegura que si falla la sincronización de neovim,
+      # se intente de todas formas la del README.
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Workflows"
+            msg: "👷: sync Workflows folder"
+            targets: "all"
+            path: ".github/workflows"
+
+          - name: "ZSH"
+            msg: "🔧 Chore: sync .zshrc"
+            targets: ${{ vars.SYNC_GROUP_UNIX }}
+            path: ".zshrc"
+
+          - name: "Neovim"
+            msg: "🧱 Chore: sync Neovim config"
+            targets:  ${{ vars.SYNC_GROUP_ALL }}
+            path: ".config/nvim"
+
+          - name: "Documentation"
+            msg: "📝 docs: sync README.md"
+            targets: "all"
+            path: "README.md"
+
+    uses: ./.github/workflows/sync-files.yaml
+    with:
+      files-path: ${{ matrix.path }}
+      commit-message: ${{ matrix.msg }}
+      target-branches: ${{ matrix.targets }}

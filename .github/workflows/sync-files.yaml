@@ -1,0 +1,111 @@
+name: Sync files between branches
+
+on:
+  workflow_call:
+    inputs:
+      commit-message:
+        required: false
+        type: string
+      files-path:
+        required: true
+        type: string
+      target-branches:
+        required: true
+        type: string
+      update-all-branches:
+        required: false
+        type: boolean
+
+    # secrets:
+    #   token:
+    #     required: true
+
+jobs:
+  sync-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      # Colores para la terminal
+      BLACK:              '\033[0;30m'
+      BLUE:               '\033[0;34m'
+      BRIGHT_BLUE:        '\033[0;94m'
+      GREEN:              '\033[0;32m'
+      MAGENTA:            '\033[0;35m'
+      YELLOW:             '\033[0;33m'
+
+      BG_BRIGHT_MAGENTA:  '\033[0;105m'
+      BG_BRIGHT_YELLOW:   '\033[0;103m'
+
+      BOLD:           '\033[1m'
+      BLINK:          '\033[5m'
+      DIM:            '\033[2m'
+      UNDERLINE:      '\033[4m'
+      UNDERLINE_OFF:  '\033[24m'
+      NC:             '\033[0m' # No Color
+
+      COMMIT_MESSAGE: "${{ inputs.commit-message}}"
+      FILES_PATH:     "${{ inputs.files-path }}"
+      SOURCE_BRANCH:  "${{ github.ref_name }}"
+      TARGETS:        "${{ inputs.target-branches}}"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync Folder Process
+        run: |
+          if [ "$TARGETS" == "all" ]; then
+            echo -e "${BG_BRIGHT_YELLOW}${BLACK}Detectado modo: Sincronizar con ${UNDERLINE}TODAS${UNDERLINE_OFF} las ramas${NC}"
+
+            # Listamos ramas, quitamos el HEAD, quitamos el prefijo 'origin/' y la rama actual
+            TARGET_LIST=$(git branch -r | grep -v "\->" | grep -v "origin/$SOURCE_BRANCH" | sed 's/origin\///' | xargs)
+          else
+            TARGET_LIST=$TARGETS
+          fi
+
+
+          echo -e "${BOLD}Iniciando sincronización desde:${BRIGHT_BLUE}${BLINK} $SOURCE_BRANCH ${NC}"
+          echo -e "Sincronizando archivos:${UNDERLINE}${BRIGHT_BLUE} $FILES_PATH ${NC}"
+          echo -e "Ramas objetivo: ${UNDERLINE}${BRIGHT_BLUE} $TARGET_LIST ${NC}"
+
+          for branch in $TARGET_LIST; do
+            if [ "$branch" == "$SOURCE_BRANCH" ]; then continue;fi
+
+            # 1. Creamos un grupo colapsable para cada rama
+            echo -e "::group::${DIM}Sincronizando con rama:${NC} $branch"
+
+            if git checkout "$branch"; then
+              # PASO CLAVE: Borramos el contenido actual en la rama destino para que 
+              # si borraste un archivo en la origen, también se borre en la destino.
+              rm -rf "$FILES_PATH"
+
+              # Traemos la versión fresca de loa archivos desde la rama origen
+              git checkout "$SOURCE_BRANCH" -- "$FILES_PATH"
+
+              echo -e "${BLUE}Rama ${BG_BRIGHT_YELLOW}${BLACK}$branch${NC}${BLUE} actualizada con los cambios de ${BG_BRIGHT_MAGENTA}${BLACK}$SOURCE_BRANCH ${NC}"
+
+              if ! git diff --cached --exit-code; then
+                git commit -m "$COMMIT_MESSAGE | [ '$FILES_PATH' from $SOURCE_BRANCH ]"
+                git push origin "$branch"
+
+                # 2. Usamos un "notice" para que aparezca en el resumen general
+                echo -e "::notice title=Éxito::${GREEN}Sincronización completada en rama $branch${NC}"
+              else
+                echo -e "${GREEN}Sin cambios pendientes en $branch.${NC}"
+              fi
+            else
+                echo "::error::No se pudo encontrar la rama $branch"
+            fi
+
+            # 3. Cerramos el grupo
+            echo "::endgroup::"
+          done
