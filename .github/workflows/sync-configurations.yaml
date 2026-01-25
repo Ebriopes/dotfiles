@@ -22,9 +22,6 @@ env:
 
 jobs:
   sync-workflows:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
     uses: ./.github/workflows/sync-files.yaml
     with:
       commit-message: "👷: sync Workflows folder"
