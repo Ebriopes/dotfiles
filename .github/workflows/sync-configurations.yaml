@@ -29,99 +29,18 @@ jobs:
       target-branches: ${{ vars.SYNC_GROUP_ALL }}
 
   sync-zsh:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Sync ZSHRC to other branches
-        run: |
-          SOURCE_BRANCH="${{ github.ref_name }}"
-          echo "Rama origen: $SOURCE_BRANCH"
-
-          # Usamos la variable de entorno directamente con la sintaxis de Bash $SYNC_GROUP
-          for branch in $SYNC_GROUP_UNIX; do
-            
-            if [ "$branch" == "$SOURCE_BRANCH" ]; then
-              echo "Saltando $branch (es la rama origen)."
-              continue
-            fi
-
-            echo "--- Sincronizando ZSH con: $branch ---"
-            
-            if git checkout "$branch"; then
-                git checkout "$SOURCE_BRANCH" -- .zshrc
-                
-                if ! git diff --cached --exit-code; then
-                  git commit -m "🔧 Chore: sync .zshrc from '$SOURCE_BRANCH'"
-                  git push origin "$branch"
-                else
-                  echo "No hay cambios detectados en $branch."
-                fi
-            else
-                echo "Error: La rama $branch no existe o no se pudo acceder."
-            fi
-          done
+    uses: ./.github/workflows/sync-files.yaml
+    with:
+      commit-message: "🔧 Chore: sync .zshrc"
+      files-path: ".zshrc"
+      target-branches: ${{ vars.SYNC_GROUP_UNIX }}
 
   sync-neovim:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Sync Folder Process
-        run: |
-          FOLDER=".config/nvim"
-          SOURCE_BRANCH="${{ github.ref_name }}"
-
-          echo "Sincronizando carpeta: $FOLDER"
-          echo "Desde rama origen: $SOURCE_BRANCH"
-
-          for branch in $SYNC_GROUP_UNIX; do
-            if [ "$branch" == "$SOURCE_BRANCH" ]; then
-              continue
-            fi
-
-            echo "--- Procesando rama: $branch ---"
-
-            if git checkout "$branch"; then
-              # PASO CLAVE: Borramos el contenido actual en la rama destino para que 
-              # si borraste un archivo en la origen, también se borre en la destino.
-              rm -rf "$FOLDER"
-              
-              # Traemos la versión fresca de la carpeta desde la rama origen
-              git checkout "$SOURCE_BRANCH" -- "$FOLDER"
-              
-              if ! git diff --cached --exit-code; then
-                git commit -m ":bricks: Chore: sync Neovim configuration ($FOLDER from $SOURCE_BRANCH)"
-                git push origin "$branch"
-              else
-                echo "No se detectaron cambios en $FOLDER para $branch."
-              fi
-            else
-              echo "Error: No se pudo acceder a la rama $branch."
-            fi
-          done
+    uses: ./.github/workflows/sync-files.yaml
+    with:
+      commit-message: "🧱 Chore: sync Neovim config"
+      files-path: ".config/nvim"
+      target-branches: ${{ vars.SYNC_GROUP_ALL }}
 
   sync-readme:
     runs-on: ubuntu-latest
