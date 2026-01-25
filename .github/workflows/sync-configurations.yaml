@@ -21,7 +21,7 @@ env:
   SYNC_GROUP_BOTH: "main linux mac-environment android-termux windows"
 
 jobs:
-  sync-everything:
+  sync:
     strategy:
       # 'fail-fast: false' asegura que si falla la sincronización de neovim,
       # se intente de todas formas la del README.
@@ -29,24 +29,24 @@ jobs:
       matrix:
         include:
           - name: "Workflows"
-            path: ".github/workflows"
             msg: "👷: sync Workflows folder"
-            targets: all"
+            targets: "all"
+            path: ".github/workflows"
 
           - name: "ZSH"
-            path: ".zshrc"
             msg: "🔧 Chore: sync .zshrc"
             targets: ${{ vars.SYNC_GROUP_UNIX }}
+            path: ".zshrc"
 
           - name: "Neovim"
-            path: ".config/nvim"
             msg: "🧱 Chore: sync Neovim config"
             targets:  ${{ vars.SYNC_GROUP_ALL }}
+            path: ".config/nvim"
 
           - name: "Documentation"
-            path: "README.md"
             msg: "📝 docs: sync README.md"
             targets: "all"
+            path: "README.md"
 
     uses: ./.github/workflows/sync-files.yaml
     with:
