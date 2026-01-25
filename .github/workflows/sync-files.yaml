@@ -64,7 +64,7 @@ jobs:
       - name: Sync Folder Process
         run: |
           if [ "$TARGETS" == "all" ]; then
-            echo -e "${BG_BRIGHT_YELLOW}${BLACK}Detectado modo: Sincronizar con ${UNDERLINE}TODAS${UNDERLINE_OFF} las ramas${NC}"
+            echo -e "${YELLOW}Detectado modo: Sincronizar con ${UNDERLINE}TODAS${UNDERLINE_OFF} las ramas${NC}"
 
             # Listamos ramas, quitamos el HEAD, quitamos el prefijo 'origin/' y la rama actual
             TARGET_LIST=$(git branch -r | grep -v "\->" | grep -v "origin/$SOURCE_BRANCH" | sed 's/origin\///' | xargs)
@@ -72,10 +72,9 @@ jobs:
             TARGET_LIST=$TARGETS
           fi
 
-
           echo -e "${BOLD}Iniciando sincronización desde:${BRIGHT_BLUE}${BLINK} $SOURCE_BRANCH ${NC}"
           echo -e "Sincronizando archivos:${UNDERLINE}${BRIGHT_BLUE} $FILES_PATH ${NC}"
-          echo -e "Ramas objetivo: ${UNDERLINE}${BRIGHT_BLUE} $TARGET_LIST ${NC}"
+          echo -e "Ramas objetivo:${UNDERLINE}${BRIGHT_BLUE} $TARGET_LIST ${NC}"
 
           for branch in $TARGET_LIST; do
             if [ "$branch" == "$SOURCE_BRANCH" ]; then continue;fi
@@ -91,7 +90,7 @@ jobs:
               # Traemos la versión fresca de loa archivos desde la rama origen
               git checkout "$SOURCE_BRANCH" -- "$FILES_PATH"
 
-              echo -e "${BLUE}Rama ${BG_BRIGHT_YELLOW}${BLACK}$branch${NC}${BLUE} actualizada con los cambios de ${BG_BRIGHT_MAGENTA}${BLACK}$SOURCE_BRANCH ${NC}"
+              echo -e "${BLUE}Rama ${BG_BRIGHT_YELLOW}$branch${NC}${BLUE} actualizada con los cambios de ${BG_BRIGHT_MAGENTA}$SOURCE_BRANCH ${NC}"
 
               if ! git diff --cached --exit-code; then
                 git commit -m "$COMMIT_MESSAGE | [ '$FILES_PATH' from $SOURCE_BRANCH ]"
