@@ -26,7 +26,7 @@ jobs:
     with:
       commit-message: "👷: sync Workflows folder"
       files-path: ".github/workflows"
-      target-branches: ${{ vars.SYNC_GROUP_ALL }}
+      target-branches: "all"
 
   sync-zsh:
     uses: ./.github/workflows/sync-files.yaml

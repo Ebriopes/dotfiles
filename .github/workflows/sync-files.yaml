@@ -12,6 +12,9 @@ on:
       target-branches:
         required: true
         type: string
+      update-all-branches:
+        required: false
+        type: boolean
 
     # secrets:
     #   token:
@@ -25,14 +28,25 @@ jobs:
 
     env:
       # Colores para la terminal
+      BLUE: '\033[0;34m'
+      BRIGHT_BLUE: '\033[0;94m'
       GREEN: '\033[0;32m'
+      MAGENTA: '\033[0;35m'
+      BG_BRIGHT_MAGENTA: '\033[0;105m'
+      YELLOW: '\033[0;33m'
+      BG_BRIGHT_YELLOW: '\033[0;103m'
+
       BOLD: '\033[1m'
+      BLINK: '\033[5m'
+      DIM: '\033[2m'
+      UNDERLINE: '\033[4m'
+      UNDERLINE_OFF: '\033[24m'
       NC: '\033[0m' # No Color
 
       COMMIT_MESSAGE: "${{ inputs.commit-message}}"
       FILES_PATH: "${{ inputs.files-path }}"
       SOURCE_BRANCH: "${{ github.ref_name }}"
-      SYNC_GROUP: "${{ inputs.target-branches}}"
+      TARGETS: "${{ inputs.target-branches}}"
 
     steps:
       - name: Checkout code
@@ -47,14 +61,23 @@ jobs:
 
       - name: Sync Folder Process
         run: |
-          echo -e "${BOLD}Iniciando sincronización desde: $SOURCE_BRANCH${NC}"
-          echo "Sincronizando archivos: $FILES_PATH"
+          if [ "$TARGETS" == "all" ]; then
+            echo "${BG_BRIGHT_YELLOW}Detectado modo: Sincronizar con ${UNDERLINE}TODAS${UNDERLINE_OFF} las ramas${NC}"
+            # Listamos ramas, quitamos el HEAD, quitamos el prefijo 'origin/' y la rama actual
+            TARGET_LIST=$(git branch -r | grep -v "\->" | sed 's/origin\///' | grep -v -w "$SOURCE" | xargs)
+          else
+            TARGET_LIST=$TARGETS
+          fi
 
-          for branch in $SYNC_GROUP; do
+
+          echo -e "${BOLD}Iniciando sincronización desde:${BRIGHT_BLUE}${BLINK} $SOURCE_BRANCH ${NC}"
+          echo -e "Sincronizando archivos:${UNDERLINE}${BRIGHT_BLUE} $FILES_PATH ${NC}"
+
+          for branch in $TARGET_LIST; do
             if [ "$branch" == "$SOURCE_BRANCH" ]; then continue;fi
 
             # 1. Creamos un grupo colapsable para cada rama
-            echo "::group::Sincronizando con rama: $branch"
+            echo "::group::${DIM}Sincronizando con rama:${NC} $branch"
 
             if git checkout "$branch"; then
               # PASO CLAVE: Borramos el contenido actual en la rama destino para que 
@@ -64,12 +87,14 @@ jobs:
               # Traemos la versión fresca de loa archivos desde la rama origen
               git checkout "$SOURCE_BRANCH" -- "$FILES_PATH"
 
+              echo -e "${BLUE}Rama ${BG_BRIGHT_YELLOW}$branch actualizada con los cambios de ${BG_BRIGHT_MAGENTA}$SOURCE_BRANCH ${NC}"
+
               if ! git diff --cached --exit-code; then
                 git commit -m "$COMMIT_MESSAGE | [ '$FILES_PATH' from $SOURCE_BRANCH ]"
                 git push origin "$branch"
 
                 # 2. Usamos un "notice" para que aparezca en el resumen general
-                echo "::notice title=Éxito::Sincronización completada en rama $branch"
+                echo "::notice title=Éxito::${GREEN}Sincronización completada en rama $branch${NC}"
               else
                 echo -e "${GREEN}Sin cambios pendientes en $branch.${NC}"
               fi
