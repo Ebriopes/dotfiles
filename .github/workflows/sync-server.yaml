@@ -3,14 +3,8 @@ name: Sync Environment Cross Configurations
 on:
   push:
     branches:
-      - main
-      - linux
-      - mac-environment
-      - windows
-      - android-termux
+      - server
     paths:
-      - ".zshrc"
-      - ".config/nvim/**"
       - ".github/workflows/**"
       - "README.md"
 
@@ -26,16 +20,6 @@ jobs:
             msg: "👷 Chore: sync Workflows folder"
             targets: "all"
             path: ".github/workflows"
-
-          - name: "ZSH"
-            msg: "🔧 Chore: sync .zshrc"
-            targets: ${{ vars.SYNC_GROUP_UNIX }}
-            path: ".zshrc"
-
-          - name: "Neovim"
-            msg: "🧱 Chore: sync Neovim config"
-            targets:  ${{ vars.SYNC_GROUP_ALL }}
-            path: ".config/nvim"
 
           - name: "Documentation"
             msg: "📝 docs: Update README content "
