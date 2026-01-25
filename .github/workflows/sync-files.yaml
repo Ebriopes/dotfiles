@@ -90,7 +90,7 @@ jobs:
               # Traemos la versión fresca de loa archivos desde la rama origen
               git checkout "$SOURCE_BRANCH" -- "$FILES_PATH"
 
-              echo -e "${BLUE}Rama ${BG_BRIGHT_YELLOW}$branch${NC}${BLUE} actualizada con los cambios de ${BG_BRIGHT_MAGENTA}$SOURCE_BRANCH ${NC}"
+              echo -e "${BLUE}Rama ${YELLOW}$branch${NC}${BLUE} actualizada con los cambios de ${MAGENTA}$SOURCE_BRANCH ${NC}"
 
               if ! git diff --cached --exit-code; then
                 git commit -m "$COMMIT_MESSAGE | [ '$FILES_PATH' from $SOURCE_BRANCH ]"
