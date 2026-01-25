@@ -51,7 +51,7 @@ bash <(wget -qO - https://raw.githubusercontent.com/Ebriopes/dotfiles/server/ass
 
 ##### Curl
 
-```sh Curl
+```sh
 bash <(curl -L https://raw.githubusercontent.com/Ebriopes/dotfiles/server/assets/scripts/installer.sh)
 ```
 
