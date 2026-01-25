@@ -14,12 +14,6 @@ on:
       - ".github/workflows/**"
       - "README.md"
 
-# Definimos aquí las ramas que queremos mantener en el grupo de sincronización
-env:
-  SYNC_GROUP_UNIX: "main linux mac-environment android-termux"
-  SYNC_GROUP_DOS: "main windows"
-  SYNC_GROUP_BOTH: "main linux mac-environment android-termux windows"
-
 jobs:
   sync:
     strategy:
