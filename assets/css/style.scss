@@ -5,56 +5,201 @@
 
 
 /*******************
+ * STYLE VARIABLES *
+ *******************/
+:root {
+  /* Modo Claro (Default para legibilidad al sol) */
+  --bg-color: #e5e5f7;
+  --bg-image: radial-gradient(#0875087a 0.25px, #e5e5f7 1px);
+  --border-color: #cccccc;
+  --code-bg: rgba(0, 0, 0, 0.05);
+  --code-text: #d43131;
+  --header-text: #006600; // Un verde más oscuro y legible
+  --link-color: #005fa3;
+  --main-text: #222222;
+  --shadow: none;
+  
+  --btn-bg-bottom: rgba(180, 180, 180, 0.8);
+  --btn-bg-top: rgba(220, 220, 220, 0.8);
+  --btn-border: #999999;
+  --btn-hover-bg: #006600; 
+  --btn-hover-text: #ffffff;
+  --btn-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  --btn-text: #222222;
+}
+
+/*******************
  * OVERRIDE STYLES *
  *******************/
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+  font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+  color: var(--header-text);
+  letter-spacing: -0.03em;
+  text-shadow: var(--shadow); // La sombra solo aparecerá en modo oscuro
+}
+
+ul > li {
+  list-style-type: disc;
+  list-style-image: unset;
+}
+
 .btn {
   display: inline-block;
-  background: -webkit-linear-gradient(top, rgba(40, 40, 40, 0.3), rgba(35, 35, 35, 0.3) 50%, rgba(10, 10, 10, 0.3) 50%, rgba(0, 0, 0, 0.3));
   padding: 8px 18px;
+  
+  /* Colores dinámicos */
+  color: var(--btn-text);
+  background: linear-gradient(to bottom, var(--btn-bg-top), var(--btn-bg-bottom));
+  border: 2px solid var(--btn-border);
+  border-top: 2px solid var(--btn-border);
+  text-shadow: var(--btn-shadow);
+  
   border-radius: 50px;
-  border: 2px solid rgba(0, 0, 0, 0.7);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.7);
-  border-top: 2px solid rgba(0, 0, 0, 1);
-  color: rgba(255, 255, 255, 0.8);
   font-family: Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: 13px;
   text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 250ms ease-in-out;
   cursor: pointer;
-}
 
-.btn:hover {
-  background-color: #b5e853
-}
+  &:hover {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+    border-color: var(--btn-hover-text);
+    text-shadow: none;
+  }
 
-.container {
-  &:last-of-type:has(#main_content) {
-    margin-block-end: 5rem ;
+  &.btn-github .icon,
+  &.btn-github:hover .icon{
+    opacity: 0.9;
+    background: url("../images/blacktocat.png") 0 0 no-repeat;
+    filter: brightness(0);
   }
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--main-text);
+  background: var(--bg-color) var(--bg-image) var(--bg-position, 0 0 / 10px 10px);
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+
+  > header {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 20px 0;
+    border-bottom: 1px dashed var(--header-text);
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(1px) hue-rotate(250deg);
+
+    #a-title > h1 {
+      margin-block-end: 1rem;
+      color: var(--header-text);
+    }
+  }
+
+  > .container {
+    padding: 1rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(1px) hue-rotate(160deg);
+
+    &:last-of-type:has(#main_content) {
+      margin-block-end: 5rem;
+    }
+
+    #main_content {
+
+      >p,
+      >ul,
+      >div {
+        margin-inline-start: 2rem;
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+        // border-top: double .5rem teal;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        margin-inline-start: 1rem;
+      }
+
+      h4 {
+        font-size: 1.25rem;
+        margin-inline-start: 1.5rem;
+      }
+
+      h5 {
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin: 0 0 5px 0;
+        margin-inline-start: 1.75rem;
+      }
+
+      strong {
+        color: teal;
+        // text-decoration: underline;
+      }
+
+      // hr {
+      //   + :is(h2){
+      //     border-top: unset;
+      //   }
+      // }
+
+      *+ {
+        h1 {
+          margin-block-start: 5rem;
+        }
+
+        h2 {
+          margin-block-start: 3rem;
+        }
+
+        h3,
+        h4 {
+          margin-block-start: 2rem;
+        }
+
+        h5 {
+          margin-block-start: 1rem;
+        }
+      }
+    }
+  }
+}
+
+
 pre {
+  padding: 10px;
+  color: #b5e853CC;
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 10px;
-  font-size: 16px;
-  color: #b5e853CC;
   border-radius: 5px;
-  word-wrap: normal;
   overflow: auto;
   overflow-y: hidden;
-  
-  > code {
+  scrollbar-color: #b5e853CC #000;
+  scrollbar-width: thin;
+  font-size: 16px;
+  word-wrap: normal;
+
+  >code {
     color: #b5e853CC;
   }
 }
 
 code.highlighter-rouge {
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 3px;
   margin: 0px -3px;
@@ -62,91 +207,68 @@ code.highlighter-rouge {
   border-radius: 2px;
 }
 
-#main_content {
-  >p,
-  >ul,
-  >div {
-    margin-inline-start: 2rem;
-  }
-
-  h1 {
-    font-size: 3rem;
-  }
-
-  h2 {
-    font-size: 2rem;
-    // border-top: double .5rem teal;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    margin-inline-start: 1rem;
-  }
-
-  h4 {
-    font-size: 1.25rem;
-    margin-inline-start: 1.5rem;
-  }
-
-  h5 {
-    font-size: 1rem;
-    text-transform: uppercase;
-    margin: 0 0 5px 0;
-    margin-inline-start: 1.75rem;
-  }
-
-  strong {
-    color: teal;
-    // text-decoration: underline;
-  }
-
-  // hr {
-  //   + :is(h2){
-  //     border-top: unset;
-  //   }
-  // }
-
-  * + {
-    h1 {
-      margin-block-start: 5rem;
-    }
-
-    h2 {
-      margin-block-start: 3rem;
-    }
-
-    h3, h4 {
-      margin-block-start: 2rem;
-    }
-
-    h5 {
-      margin-block-start: 1rem;
-    }
-  }
-}
-
 /*****************
  * CUSTOM STYLES *
  *****************/
 
 // div.highlighter-rouge {
-  .highlight {
-    border-radius: 5px;
+.highlight {
+  border-radius: 0.5rem;
 
-    > pre{
-      margin: 0;
-      padding: 1rem;
-      transition: all 500ms ease-in-out;
+  >pre {
+    margin: 0;
+    padding: 0.5rem;
+    transition: all 500ms ease-in-out;
 
-      &:has(+ .code-header > button:hover){
-        background-color: #666;
-      }
-    }
-
-    > .code-header{
-      padding-block: 8px 3px;
-      display: flex;
-      justify-content: flex-end;
+    &:has(+ .code-header > button:hover) {
+      background-color: #666;
     }
   }
+
+  >.code-header {
+    padding-block: 8px 3px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
 // }
+
+@media (prefers-color-scheme: light) {
+  // Nota: Jekyll suele traer 'github' o 'base16-light'
+  // Si no tienes el archivo, puedes dejar el oscuro pero notarás poco contraste
+  // @import "rouge-base16-light"; 
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Modo Oscuro (El original del tema Hacker) */
+    --bg-color: #222222; // $cod-grey
+    --bg-image: #{unquote('url("../images/bkg.png")')};
+    --bg-position: 0 0;
+    --border-color: #b5e853;
+    --code-bg: rgba(0, 0, 0, 0.9);
+    --code-text: #b5e853;
+    --header-text: #b5e853; // $conifer
+    --link-color: #63c0f5;
+    --main-text: #eeeeee; // $gallery
+    --shadow: 0 0 5px rgba(181, 232, 83, 0.2);
+
+    --btn-bg-bottom: rgba(0, 0, 0, 0.8);
+    --btn-bg-top: rgba(40, 40, 40, 0.6);
+    --btn-border: #000000;
+    --btn-hover-bg: #b5e853;
+    --btn-hover-text: #222222;
+    --btn-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75);
+    --btn-text: #eeeeee;
+  }
+
+  ul > li {
+    list-style-image: url("../images/bullet.png");
+  }
+
+  .btn.btn-github .icon {
+    opacity: 1;
+    filter: unset;
+  }
+}
