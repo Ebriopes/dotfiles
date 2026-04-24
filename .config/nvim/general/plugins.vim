@@ -164,6 +164,9 @@ call plug#begin()
 
       " Manager installer
       Plug 'williamboman/mason-lspconfig.nvim'
+
+      "  Opencode integration
+      Plug 'nickjvandyke/opencode.nvim'
     endif
 
   else

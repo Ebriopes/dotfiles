@@ -5,6 +5,19 @@ if not is_installed then
 end
 
 snacks.setup({
+  input = {}, -- enhances `ask()` [opencode]
+  picker = {  -- Mejora select() [opencode]
+    actions = {
+      opencode_send = function(...) return require("opencode").snacks_picker_send(...) end,
+    },
+    win = {
+      input = {
+        keys = {
+          ["<C-s>"] = { "opencode_send", mode = { "n", "i" } }, -- Asigna una tecla, ej: Ctrl+s
+        },
+      },
+    },
+  },
   dashboard = {
     enabled = true,
     sections = {

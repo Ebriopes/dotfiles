@@ -70,6 +70,12 @@ local lsp_server_settings = {
     -- end,
     single_file_support = false,
   },
+  --denols = {
+    ----root_dir = require("lspconfig").util.root_pattern({"deno.json", "deno.jsonc"}),
+    --filetypes: { "javascript", "javascriptreact", "typescript", "typescriptreact" }
+    --single_file_support = false,
+    --settings = {},
+  --}
 }
 
 lsp_server_settings.sumneko_lua = lsp_server_settings.lua_ls

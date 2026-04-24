@@ -130,34 +130,18 @@ export NODE_OPTIONS="--max-old-space-size=16384"
 export PATH="$PATH:/usr/local/bin"
 #export PATH="$PATH:/Users/daniel/.local/bin" #Add it in .zprofile
 
-##########         Functions         ##########
-# Función de autocompletado
-function _config_autocomplete {
-  local curcontext="$curcontext"
-  local words=("${words[@]}")
-  local word="$words[$((CURRENT-1))]"
-  _git "$@"
-}
-
-# Asociar la función con el alias para nuestro commando config
-compdef _config_autocomplete config
-
-function cd_tree() {
-    \cd "${@:-$HOME}" && tree -ldCL 1
-}
-
 ############ Alias ############
 # Places
 alias work="cd ~/Documents/Repos"
 alias projects="cd ~/Documents/Repos/Proyectos"
 alias features="cd ~/Documents/Repos/Features"
-alias glomove="cd ~/Documents/Repos/Proyectos/Glomo-VE"
+#alias glomove="cd ~/Documents/Repos/Proyectos/Glomo-VE"
 
 # Redirects
 alias python='python3'
 
 # Commands
-alias cd=cd_tree
+#alias cd=cd_tree
 alias tree='tree --dirsfirst --du -hlC -L1'
 alias lt='tree -aFL 1'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
@@ -172,17 +156,25 @@ if type pyenv &> /dev/null;then
   eval "$(pyenv init - zsh)"
 fi
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # place this after nvm initialization!
 #autoload -U compinit && compinit
 autoload -U add-zsh-hook
+
+## pnpm
+#export PNPM_HOME="/Users/daniel/Library/pnpm"
+#case ":$PATH:" in
+  #*":$PNPM_HOME:"*) ;;
+  #*) export PATH="$PNPM_HOME:$PATH" ;;
+#esac
+## pnpm end
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 load-nvmrc() {
   local nvmrc_path
@@ -203,8 +195,8 @@ load-nvmrc() {
   fi
 }
 
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
+#add-zsh-hook chpwd load-nvmrc
+#load-nvmrc
 
 eval "$(register-python-argcomplete pipx)"
 
@@ -250,4 +242,5 @@ fi
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
 
