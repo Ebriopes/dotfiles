@@ -55,7 +55,7 @@ local on_attach = function(client, bufnr)
             print(vim.inspect(lsp_buf.list_workspace_folders()))
         end, bufopts)
         keymap("n", "<space>D", lsp_buf.type_definition, bufopts)
-        keymap("n", "<leader>rn", lsp_buf.rename, bufopts)
+        keymap("n", "<space>rn", lsp_buf.rename, bufopts)
         keymap("n", "<space>ca", lsp_buf.code_action, bufopts)
         -- keymap('n', 'gr', lsp_buf.references, bufopts)
 
